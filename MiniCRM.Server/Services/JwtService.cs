@@ -1,31 +1,37 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MiniCRM.Server.Data;
 using MiniCRM.Server.Entities;
 using System.IdentityModel.Tokens.Jwt;
 
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace MiniCRM.Server.Services
 {
     public interface IJwtService
     {
-        Task<string> GenerateTokenAsync(ApplicationUser user);
+        Task<string> GenerateAccessTokenAsync(ApplicationUser user);
+        Task<string> GenerateRefreshTokenAsync(string userId);
     }
     public class JwtService : IJwtService
     {
         private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
-
+        private readonly AppDbContext _context;
         public JwtService(
             IConfiguration configuration,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            AppDbContext context)
         {
             _configuration = configuration;
             _userManager = userManager;
+            _context = context; 
         }
 
-        public async Task<string> GenerateTokenAsync(ApplicationUser user)
+        public async Task<string> GenerateAccessTokenAsync(ApplicationUser user)
         {
             var roles =
                 await _userManager.GetRolesAsync(user); 
@@ -62,6 +68,23 @@ namespace MiniCRM.Server.Services
 
             return new JwtSecurityTokenHandler()
                 .WriteToken(token);
+        }
+
+        public async Task<string> GenerateRefreshTokenAsync(string userId)
+        {
+            var refreshToken = new RefreshToken
+            {
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                UserId = userId,
+                Created = DateTime.UtcNow,
+                Expires = DateTime.UtcNow.AddDays(7),
+                IsRevoked = false
+            };
+
+            _context.RefreshTokens.Add(refreshToken);
+            await _context.SaveChangesAsync();
+
+            return refreshToken.Token;
         }
     }
 }

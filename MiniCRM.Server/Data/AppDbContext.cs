@@ -69,5 +69,7 @@ namespace MiniCRM.Server.Data
         public DbSet<Opportunity> Opportunities => Set<Opportunity>();
 
         public DbSet<Note> Notes => Set<Note>();
+
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     }
 }
