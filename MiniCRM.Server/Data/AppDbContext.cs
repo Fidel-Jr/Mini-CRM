@@ -31,6 +31,13 @@ namespace MiniCRM.Server.Data
 
             // Contact configuration
             modelBuilder.Entity<Contact>().HasKey(x => x.Id);
+            modelBuilder.Entity<Contact>().Property(x => x.CustomerId)
+                .IsRequired();
+            modelBuilder.Entity<Contact>().Property(x => x.FirstName)
+                .HasMaxLength(200)
+                .IsRequired();
+            modelBuilder.Entity<Contact>().Property(x => x.Position)
+                .IsRequired();
             modelBuilder.Entity<Contact>().HasOne(x => x.Customer)
             .WithMany(x => x.Contacts)
             .HasForeignKey(x => x.CustomerId)
@@ -41,7 +48,17 @@ namespace MiniCRM.Server.Data
             modelBuilder.Entity<Opportunity>().HasKey(x => x.Id);
 
             modelBuilder.Entity<Opportunity>().Property(x => x.Value)
-                .HasColumnType("decimal(18,2)");
+                .HasColumnType("decimal(18,2)")
+                .IsRequired();
+
+            modelBuilder.Entity<Opportunity>().Property(x => x.CustomerId)
+                .IsRequired();
+            modelBuilder.Entity<Opportunity>().Property(x => x.Title)
+                .IsRequired();
+            modelBuilder.Entity<Opportunity>().Property(x => x.Value)
+                .IsRequired();
+            modelBuilder.Entity<Opportunity>().Property(x => x.Stage)
+                .IsRequired();
 
             modelBuilder.Entity<Opportunity>().Property(x => x.Stage)
                 .HasConversion(new EnumToStringConverter<OpportunityStage>());

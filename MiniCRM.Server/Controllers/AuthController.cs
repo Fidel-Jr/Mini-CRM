@@ -74,7 +74,7 @@ namespace MiniCRM.Server.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginRequest request)
+        public async Task<IActionResult> Login(LoginDto request)
         {
             if (!ModelState.IsValid)
             {
