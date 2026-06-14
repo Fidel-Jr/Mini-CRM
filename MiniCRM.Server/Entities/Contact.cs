@@ -2,9 +2,9 @@
 {
     public class Contact
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
-        public Guid CustomerId { get; set; }
+        public int CustomerId { get; set; }
 
         public string FirstName { get; set; }
             = string.Empty;

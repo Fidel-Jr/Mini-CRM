@@ -22,8 +22,16 @@ namespace MiniCRM.Server.Data
                 .HasMaxLength(200)
                 .IsRequired();
 
+            modelBuilder.Entity<Customer>().Property(x => x.Industry)
+                .HasMaxLength(255)
+                .IsRequired();
+
             modelBuilder.Entity<Customer>().Property(x => x.Email)
-                .HasMaxLength(255);
+                .HasMaxLength(255)
+                .IsRequired();
+
+            modelBuilder.Entity<Customer>().Property(x => x.Phone)
+                .HasMaxLength(50);
 
             modelBuilder.Entity<Customer>().Property(x => x.Phone)
                 .HasMaxLength(50);

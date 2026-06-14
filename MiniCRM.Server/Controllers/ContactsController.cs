@@ -36,8 +36,8 @@ namespace MiniCRM.Server.Controllers
             return Ok(contact);
         }
 
-        [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, UpdateContactDto dto)
+        [HttpPut("{id}")]      
+        public async Task<IActionResult> Update(int id, UpdateContactDto dto)
         {
             var contact = await _context.Contacts.FindAsync(id);
 
@@ -54,8 +54,8 @@ namespace MiniCRM.Server.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete(Guid id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
             var contact = await _context.Contacts.FindAsync(id);
 

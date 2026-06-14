@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace SalesPilot.Server.Migrations
+namespace MiniCRM.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -282,13 +282,15 @@ namespace SalesPilot.Server.Migrations
 
             modelBuilder.Entity("MiniCRM.Server.Entities.Contact", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("integer")
                         .HasColumnName("id");
 
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uuid")
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer")
                         .HasColumnName("customer_id");
 
                     b.Property<string>("Email")
@@ -298,7 +300,8 @@ namespace SalesPilot.Server.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
                         .HasColumnName("first_name");
 
                     b.Property<string>("LastName")
@@ -322,10 +325,12 @@ namespace SalesPilot.Server.Migrations
 
             modelBuilder.Entity("MiniCRM.Server.Entities.Customer", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("integer")
                         .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -339,7 +344,8 @@ namespace SalesPilot.Server.Migrations
 
                     b.Property<string>("Industry")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
                         .HasColumnName("industry");
 
                     b.Property<string>("Name")
@@ -367,10 +373,12 @@ namespace SalesPilot.Server.Migrations
 
             modelBuilder.Entity("MiniCRM.Server.Entities.Note", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("integer")
                         .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -381,8 +389,8 @@ namespace SalesPilot.Server.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uuid")
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer")
                         .HasColumnName("customer_id");
 
                     b.HasKey("Id")
@@ -396,17 +404,19 @@ namespace SalesPilot.Server.Migrations
 
             modelBuilder.Entity("MiniCRM.Server.Entities.Opportunity", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("integer")
                         .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uuid")
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer")
                         .HasColumnName("customer_id");
 
                     b.Property<string>("Stage")

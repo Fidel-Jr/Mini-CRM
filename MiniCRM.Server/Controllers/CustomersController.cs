@@ -53,15 +53,29 @@ namespace MiniCRM.Server.Controllers
                      {
                          CustomerId = n.CustomerId,
                          Content = n.Content
-                     }).ToList()
+                     }).ToList(),
+
                  })
                 .ToListAsync();
+            var industries = await _context.Customers
+                .AsNoTracking()
+                .GroupBy(c => c.Industry)
+                .Select(g => new IndustryDetailsDto
+                {
+                    Name = g.Key
+                })
+                .OrderBy(i => i.Name)
+                .ToListAsync();
 
-            return Ok(customers);
+            return Ok(new
+            {
+                Customers = customers,
+                Industries = industries
+            });
         }
 
-        [HttpGet("{id:guid}")]
-        public async Task<IActionResult> Get(Guid id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
         {
             var customer = await _context.Customers
             .Where(x => x.Id == id)
@@ -128,8 +142,8 @@ namespace MiniCRM.Server.Controllers
                 customer);
         }
 
-        [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, UpdateCustomerDto dto)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, UpdateCustomerDto dto)
         {
             var customer = await _context.Customers.FindAsync(id);
 
@@ -147,8 +161,8 @@ namespace MiniCRM.Server.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete(Guid id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
             var customer = await _context.Customers.FindAsync(id);
 

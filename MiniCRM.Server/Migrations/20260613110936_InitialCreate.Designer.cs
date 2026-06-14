@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using MiniCRM.Server.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using SalesPilot.Server.Data;
 
 #nullable disable
 
-namespace SalesPilot.Server.Migrations
+namespace MiniCRM.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260613110936_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -186,7 +189,7 @@ namespace SalesPilot.Server.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SalesPilot.Server.Entities.ApplicationUser", b =>
+            modelBuilder.Entity("MiniCRM.Server.Entities.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text")
@@ -280,15 +283,17 @@ namespace SalesPilot.Server.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("SalesPilot.Server.Entities.Contact", b =>
+            modelBuilder.Entity("MiniCRM.Server.Entities.Contact", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("integer")
                         .HasColumnName("id");
 
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uuid")
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer")
                         .HasColumnName("customer_id");
 
                     b.Property<string>("Email")
@@ -298,7 +303,8 @@ namespace SalesPilot.Server.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
                         .HasColumnName("first_name");
 
                     b.Property<string>("LastName")
@@ -320,12 +326,14 @@ namespace SalesPilot.Server.Migrations
                     b.ToTable("contacts", (string)null);
                 });
 
-            modelBuilder.Entity("SalesPilot.Server.Entities.Customer", b =>
+            modelBuilder.Entity("MiniCRM.Server.Entities.Customer", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("integer")
                         .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -339,7 +347,8 @@ namespace SalesPilot.Server.Migrations
 
                     b.Property<string>("Industry")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
                         .HasColumnName("industry");
 
                     b.Property<string>("Name")
@@ -365,12 +374,14 @@ namespace SalesPilot.Server.Migrations
                     b.ToTable("customers", (string)null);
                 });
 
-            modelBuilder.Entity("SalesPilot.Server.Entities.Note", b =>
+            modelBuilder.Entity("MiniCRM.Server.Entities.Note", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("integer")
                         .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -381,8 +392,8 @@ namespace SalesPilot.Server.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uuid")
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer")
                         .HasColumnName("customer_id");
 
                     b.HasKey("Id")
@@ -394,19 +405,21 @@ namespace SalesPilot.Server.Migrations
                     b.ToTable("notes", (string)null);
                 });
 
-            modelBuilder.Entity("SalesPilot.Server.Entities.Opportunity", b =>
+            modelBuilder.Entity("MiniCRM.Server.Entities.Opportunity", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("integer")
                         .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uuid")
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer")
                         .HasColumnName("customer_id");
 
                     b.Property<string>("Stage")
@@ -432,6 +445,46 @@ namespace SalesPilot.Server.Migrations
                     b.ToTable("opportunities", (string)null);
                 });
 
+            modelBuilder.Entity("MiniCRM.Server.Entities.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<DateTime>("Expires")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_revoked");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("token");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_refresh_tokens");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_refresh_tokens_user_id");
+
+                    b.ToTable("refresh_tokens", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -444,7 +497,7 @@ namespace SalesPilot.Server.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("SalesPilot.Server.Entities.ApplicationUser", null)
+                    b.HasOne("MiniCRM.Server.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -454,7 +507,7 @@ namespace SalesPilot.Server.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("SalesPilot.Server.Entities.ApplicationUser", null)
+                    b.HasOne("MiniCRM.Server.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -471,7 +524,7 @@ namespace SalesPilot.Server.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_asp_net_user_roles_asp_net_roles_role_id");
 
-                    b.HasOne("SalesPilot.Server.Entities.ApplicationUser", null)
+                    b.HasOne("MiniCRM.Server.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -481,7 +534,7 @@ namespace SalesPilot.Server.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("SalesPilot.Server.Entities.ApplicationUser", null)
+                    b.HasOne("MiniCRM.Server.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -489,9 +542,9 @@ namespace SalesPilot.Server.Migrations
                         .HasConstraintName("fk_asp_net_user_tokens_asp_net_users_user_id");
                 });
 
-            modelBuilder.Entity("SalesPilot.Server.Entities.Contact", b =>
+            modelBuilder.Entity("MiniCRM.Server.Entities.Contact", b =>
                 {
-                    b.HasOne("SalesPilot.Server.Entities.Customer", "Customer")
+                    b.HasOne("MiniCRM.Server.Entities.Customer", "Customer")
                         .WithMany("Contacts")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -501,9 +554,9 @@ namespace SalesPilot.Server.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("SalesPilot.Server.Entities.Note", b =>
+            modelBuilder.Entity("MiniCRM.Server.Entities.Note", b =>
                 {
-                    b.HasOne("SalesPilot.Server.Entities.Customer", "Customer")
+                    b.HasOne("MiniCRM.Server.Entities.Customer", "Customer")
                         .WithMany("Notes")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -513,9 +566,9 @@ namespace SalesPilot.Server.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("SalesPilot.Server.Entities.Opportunity", b =>
+            modelBuilder.Entity("MiniCRM.Server.Entities.Opportunity", b =>
                 {
-                    b.HasOne("SalesPilot.Server.Entities.Customer", "Customer")
+                    b.HasOne("MiniCRM.Server.Entities.Customer", "Customer")
                         .WithMany("Opportunities")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -525,7 +578,19 @@ namespace SalesPilot.Server.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("SalesPilot.Server.Entities.Customer", b =>
+            modelBuilder.Entity("MiniCRM.Server.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("MiniCRM.Server.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_refresh_tokens_users_user_id");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MiniCRM.Server.Entities.Customer", b =>
                 {
                     b.Navigation("Contacts");
 

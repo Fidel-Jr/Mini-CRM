@@ -5,7 +5,7 @@ namespace MiniCRM.Server.DTOs
     public class ContactDto
     {
         [Required]
-        public Guid CustomerId { get; set; }
+        public int CustomerId { get; set; }
 
         [Required]
         public string FirstName { get; set; } = string.Empty;

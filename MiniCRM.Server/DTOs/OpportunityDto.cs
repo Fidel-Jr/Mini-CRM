@@ -6,7 +6,7 @@ namespace MiniCRM.Server.DTOs
     public class OpportunityDto
     {
         [Required]
-        public Guid CustomerId { get; set; }
+        public int CustomerId { get; set; }
         
         [Required]
         public string Title { get; set; } = string.Empty;

@@ -47,8 +47,8 @@ namespace MiniCRM.Server.Controllers
             return Ok(opportunity);
         }
 
-        [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, UpdateOpportunityDto dto)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, UpdateOpportunityDto dto)
         {
             var opportunity = await _context.Opportunities.FindAsync(id);
 
@@ -69,8 +69,8 @@ namespace MiniCRM.Server.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete(Guid id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
             var opportunity = await _context.Opportunities.FindAsync(id);
 

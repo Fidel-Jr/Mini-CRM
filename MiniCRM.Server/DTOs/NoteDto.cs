@@ -5,7 +5,7 @@ namespace MiniCRM.Server.DTOs
     public class NoteDto
     {
         [Required]
-        public Guid CustomerId { get; set; }
+        public int CustomerId { get; set; }
 
         [Required]
         public string Content { get; set; } = string.Empty;

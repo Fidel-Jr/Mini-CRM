@@ -38,8 +38,8 @@ namespace MiniCRM.Server.Controllers
             return Ok(note);
         }
 
-        [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, UpdateNoteDto dto)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, UpdateNoteDto dto)
         {
             if (!ModelState.IsValid)
             {
@@ -58,8 +58,8 @@ namespace MiniCRM.Server.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete(Guid id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
             var note = await _context.Notes.FindAsync(id);
 

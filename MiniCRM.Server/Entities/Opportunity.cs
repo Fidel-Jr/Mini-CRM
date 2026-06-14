@@ -4,9 +4,9 @@ namespace MiniCRM.Server.Entities
 {
     public class Opportunity
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
-        public Guid CustomerId { get; set; }
+        public int CustomerId { get; set; }
 
         public string Title { get; set; }
             = string.Empty;
