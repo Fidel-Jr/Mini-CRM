@@ -52,8 +52,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { opportunitiesColumns } from "./customers-table/columns";
-import { opportunitiesSchema } from "./customers-table/schema";
+import { customersColumns } from "./customers-table/columns";
+import { customersSchema } from "./customers-table/schema";
 
 interface Industry {
   name: string;
@@ -65,12 +65,12 @@ async function fetchCustomers() {
   return response.json();
 }
 
-export function OpportunitiesSection() {
+export function CustomersSection() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["customers"],
     queryFn: fetchCustomers,
     select: (data) => ({
-      customers: opportunitiesSchema.parse(data.customers),
+      customers: customersSchema.parse(data.customers),
       industries: data.industries as Industry[],
     }),
   });
@@ -91,7 +91,7 @@ export function OpportunitiesSection() {
 
   const table = useReactTable({
     data: customers,
-    columns: opportunitiesColumns,
+    columns: customersColumns,
     state: {
       rowSelection,
       columnFilters,

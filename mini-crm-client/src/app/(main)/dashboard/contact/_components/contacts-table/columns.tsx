@@ -47,7 +47,7 @@ export const customersColumns: ColumnDef<CustomerRow>[] = [
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label={`Select ${row.original.name}`}
+        aria-label={`Select ${row.original.firstName}`}
       />
     ),
     enableHiding: false,
@@ -55,28 +55,37 @@ export const customersColumns: ColumnDef<CustomerRow>[] = [
   {
     accessorKey: "id",
     header: "ID",
-    cell: ({ row }) => <div className="text-sm tracking-tight">{"CT-" + row.original.id}</div>,
+    cell: ({ row }) => <div className="text-sm tracking-tight">{"CN-" + row.original.id}</div>,
     enableHiding: false,
   },
   {
-    accessorKey: "name",
-    header: "Name",
-    cell: ({ row }) => <div className="font-medium text-sm">{row.original.name}</div>,
+    accessorKey: "customerName",
+    header: "Customer",
+    cell: ({ row }) => (
+      <div className="text-sm font-medium">
+        {row.original.customerName}
+      </div>
+    ),
   },
   {
-    accessorKey: "industry",
-    header: "Industry",
+    accessorKey: "firstName",
+    header: "First Name",
+    cell: ({ row }) => <div className="font-medium text-sm">{row.original.firstName}</div>,
+  },
+  {
+    accessorKey: "lastName",
+    header: "Last Name",
+    cell: ({ row }) => <div className="text-sm">{row.original.lastName || "No Lastname"}</div>,
+  },
+  {
+    accessorKey: "position",
+    header: "Position",
     cell: ({ row }) => (
       <Badge variant="outline" className="rounded-full px-2.5">
-        {row.original.industry}
+        {row.original.position}
       </Badge>
     ),
     filterFn: "equalsString",
-  },
-  {
-    accessorKey: "website",
-    header: "Website",
-    cell: ({ row }) => <div className="text-sm">{row.original.website || "No Website"}</div>,
   },
   {
     accessorKey: "email",
@@ -84,11 +93,7 @@ export const customersColumns: ColumnDef<CustomerRow>[] = [
     cell: ({ row }) => <div className="text-sm">{row.original.email}</div>,
     filterFn: "equalsString",
   },
-  {
-    accessorKey: "phone",
-    header: "Phone",
-    cell: ({ row }) => <div className="text-sm tabular-nums">{row.original.phone || "No Phone Number"}</div>,
-  },
+  
   {
     id: "actions",
     header: () => <div className="text-right">Edit</div>,

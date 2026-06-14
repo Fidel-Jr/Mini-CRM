@@ -2,11 +2,12 @@ import z from "zod";
 
 export const customerSchema = z.object({
   id: z.number(),
-  name: z.string(),
-  industry: z.string(),
-  website: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  position: z.string(),
   email: z.string(),
-  phone: z.string(),
+  customerId: z.number(),
+  customerName: z.string().default(""),
 });
 
 export const customersSchema = z.array(customerSchema);

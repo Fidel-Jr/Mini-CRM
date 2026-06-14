@@ -12,6 +12,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Plus } from "lucide-react"
+import { AddContactForm } from "./add-contact-form"
 
 export function SheetForm() {
   return (
@@ -31,7 +32,7 @@ export function SheetForm() {
           </SheetDescription>
         </SheetHeader>
         
-        {/* <AddCustomerForm /> */}
+        <AddContactForm />
       </SheetContent>
     </Sheet>
   )
