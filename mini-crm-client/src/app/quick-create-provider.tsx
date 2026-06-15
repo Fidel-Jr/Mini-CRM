@@ -8,7 +8,8 @@ import React, { createContext, useContext, useState } from "react";
 export type QuickCreateType =
   | "customer"
   | "contact"
-  | "opportunity";
+  | "opportunity"
+  |  "note";
 
 interface QuickCreateContextType {
   openSheet: (type: QuickCreateType) => void;

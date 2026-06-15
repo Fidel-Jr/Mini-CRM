@@ -118,7 +118,7 @@ export const sidebarItems: NavGroup[] = [
       },
       {
         title: "Notes",
-        url: "/dashboard/kanban",
+        url: "/dashboard/note",
         icon: Kanban,
       },
       // {

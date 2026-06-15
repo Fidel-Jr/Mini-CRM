@@ -6,6 +6,7 @@ import { useQuickCreate } from "@/app/quick-create-provider";
 import { AddCustomerForm } from "@/app/(main)/dashboard/customer/_components/add-customer-form";
 import { AddContactForm } from "@/app/(main)/dashboard/contact/_components/add-contact-form";
 import { AddOpportunityForm } from "@/app/(main)/dashboard/opportunity/_components/add-opportunity-form";
+import { AddNoteForm } from "@/app/(main)/dashboard/note/_components/add-note-form";
 
 export function SheetForm() {
   const { isOpen, closeSheet, type } = useQuickCreate();
@@ -18,6 +19,8 @@ export function SheetForm() {
         return <AddContactForm />;
       case "opportunity":
         return <AddOpportunityForm />;
+      case "note":
+        return <AddNoteForm />;
       default:
         return null;
     }
@@ -31,11 +34,12 @@ export function SheetForm() {
             {type === "customer" && "New Customer"}
             {type === "contact" && "New Contact"}
             {type === "opportunity" && "New Opportunity"}
+            {type === "note" && "New Note"}
           </SheetTitle>
           <SheetDescription className="text-gray-600 text-base">
             Add new {type === "customer" && "Add Customer"}
             {type === "contact" && "Add Contact"}
-            {type === "opportunity" && "Add Opportunity"} here. Click save when you&apos;re done.
+            {type === "opportunity" && "Add Opportunity" } {type === "note" && "New Note"} here. Click save when you&apos;re done.
           </SheetDescription>
         </SheetHeader>
 

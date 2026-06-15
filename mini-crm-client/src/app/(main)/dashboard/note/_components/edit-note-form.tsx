@@ -40,36 +40,26 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
   customerId: z
     .number()
     .min(1, { message: "Customer is required." }),
-  title: z.string().min(1, { message: "Title is required." }),
-  value: z
-    .number()
-    .gt(0, "Value must be greater than 0"),
-  stage:z.enum([
-        "Lead",
-        "Qualified",
-        "Proposal",
-        "Won",
-        "Lost",
-      ]),
+  content: z.string().min(1, { message: "Content is required." }),
+  
 });
 
-type OpportunityForm = z.input<typeof formSchema>;
+type NoteForm = z.input<typeof formSchema>;
 
-interface Opportunity {
+interface Note {
   id: number;
   customerId: number;
-  title: string;
-  value: number;
-  stage: string;
+  content: string;
 }
 
-interface EditOpportunitySheetProps {
-  opportunity: Opportunity;
+interface EditNoteSheetProps {
+  note: Note;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -91,16 +81,16 @@ async function getCustomers(): Promise<Customer[]> {
     return data.customers;
   }
 
-async function updateOpportunity(opportunity: Opportunity) {
-  const response = await fetch(`https://localhost:7187/api/opportunities/${opportunity.id}`, {
+async function updateNote(note: Note) {
+  const response = await fetch(`https://localhost:7187/api/notes/${note.id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(opportunity),
+    body: JSON.stringify(note),
   });
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
-    throw new Error(err.message || err.name || "Failed to update opportunity");
+    throw new Error(err.message || err.name || "Failed to update note");
   }
 
   // Handle 204 No Content or any empty body response
@@ -109,16 +99,14 @@ async function updateOpportunity(opportunity: Opportunity) {
 }
 
 
-export function EditOpportunitySheet({ opportunity, open, onOpenChange }: EditOpportunitySheetProps) {
+export function EditNoteSheet({ note, open, onOpenChange }: EditNoteSheetProps) {
   const queryClient = useQueryClient();
 
-  const form = useForm<OpportunityForm>({
+  const form = useForm<NoteForm>({
       resolver: zodResolver(formSchema),
       defaultValues: {
         customerId: 0,
-        title: "",
-        value: 0,
-        stage: "Lead",
+        content: "",
       },
     });
 
@@ -130,22 +118,21 @@ export function EditOpportunitySheet({ opportunity, open, onOpenChange }: EditOp
   // Sync form when customer prop changes (e.g. opening a different row)
   React.useEffect(() => {
     form.reset({
-      customerId: opportunity.customerId,
-      title: opportunity.title,
-      value: opportunity.value,
-      stage: opportunity.stage as any,
+      customerId: note.customerId,
+      content: note.content,
+     
     });
-  }, [opportunity, form]);
+  }, [note, form]);
 
   const mutation = useMutation({
-    mutationFn: (data: OpportunityForm) => updateOpportunity({ ...data,
-    id: opportunity.id,}),
+    mutationFn: (data: NoteForm) => updateNote({ ...data,
+    id: note.id,}),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["opportunities"] });
-      toast.success("opportunity updated successfully", {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      toast.success("note updated successfully", {
         description: (
           <span className="text-green-600">
-            "{variables.title}" has been updated.
+            Note has been updated.
           </span>
         ),
       });
@@ -163,14 +150,14 @@ export function EditOpportunitySheet({ opportunity, open, onOpenChange }: EditOp
     },
   });
 
-  const onSubmit = (data: OpportunityForm) => mutation.mutate(data);
+  const onSubmit = (data: NoteForm) => mutation.mutate(data);
   const isSubmitting = mutation.isPending;
   const [openCombo, setOpenCombo] = React.useState(false);
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="!w-full sm:!w-[500px] !max-w-none sm:!max-w-none rounded-t-2xl sm:rounded-2xl shadow-xl">
         <SheetHeader className="pb-6 border-b border-gray-100">
-          <SheetTitle className="text-2xl font-bold">Edit Opportunity</SheetTitle>
+          <SheetTitle className="text-2xl font-bold">Edit Note</SheetTitle>
           <SheetDescription className="text-gray-600 text-base">
             Update customer information below. Click save when you&apos;re done.
           </SheetDescription>
@@ -256,80 +243,24 @@ export function EditOpportunitySheet({ opportunity, open, onOpenChange }: EditOp
         
         <Controller
           control={form.control}
-          name="title"
+          name="content"
           render={({ field, fieldState }) => (
             <div className="grid gap-3" data-invalid={fieldState.invalid}>
-              <Label htmlFor="opportunity-title" className="text-sm font-semibold text-gray-700">
-                Title
-              </Label>
-              <Input
-                {...field}
-                id="opportunity-title"
-                placeholder="Enter title"
-                autoComplete="title"
-                aria-invalid={fieldState.invalid}
-                className="rounded-lg border-gray-200 focus:border-primary focus:ring-primary h-11"
-              />
-              {fieldState.invalid && (
-                <p className="text-sm text-red-600">{fieldState.error?.message}</p>
-              )}
-            </div>
-          )}
-        />
-
-        <Controller
-          control={form.control}
-          name="value"
-          render={({ field, fieldState }) => (
-            <div className="grid gap-3" data-invalid={fieldState.invalid}>
-              <Label htmlFor="value" className="text-sm font-semibold text-gray-700">
-                Value
-              </Label>
-
-              <Input
-                {...field}
-                id="value"
-                type="number"
-                onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                placeholder="Enter value"
-                aria-invalid={fieldState.invalid}
-                className="rounded-lg border-gray-200 focus:border-primary focus:ring-primary h-11"
-              />
-
-              {fieldState.invalid && (
-                <p className="text-sm text-red-600">
-                  {fieldState.error?.message}
-                </p>
-              )}
-            </div>
-          )}
-        />
-
-        <Controller
-          control={form.control}
-          name="stage"
-          render={({ field, fieldState }) => (
-            <div className="grid gap-3" data-invalid={fieldState.invalid}>
-              <Label className="text-sm font-semibold text-gray-700">
-                Stage
-              </Label>
-
-              <Select
-                value={field.value}
-                onValueChange={field.onChange}
+              <Label
+                htmlFor="note-content"
+                className="text-sm font-semibold text-gray-700"
               >
-                <SelectTrigger className="w-full !h-11 rounded-lg border-gray-200">
-                  <SelectValue placeholder="Select stage" />
-                </SelectTrigger>
+                Content
+              </Label>
 
-                <SelectContent>
-                  <SelectItem value="Lead">Lead</SelectItem>
-                  <SelectItem value="Qualified">Qualified</SelectItem>
-                  <SelectItem value="Proposal">Proposal</SelectItem>
-                  <SelectItem value="Won">Won</SelectItem>
-                  <SelectItem value="Lost">Lost</SelectItem>
-                </SelectContent>
-              </Select>
+              <Textarea
+                {...field}
+                id="note-content"
+                placeholder="Write content"
+                autoComplete="off"
+                aria-invalid={fieldState.invalid}
+                className="rounded-lg border-gray-200 focus:border-primary focus:ring-primary min-h-32"
+              />
 
               {fieldState.invalid && (
                 <p className="text-sm text-red-600">
@@ -339,6 +270,7 @@ export function EditOpportunitySheet({ opportunity, open, onOpenChange }: EditOp
             </div>
           )}
         />
+
           </div>
 
           <SheetFooter className="pt-6 border-t border-gray-100 gap-3">

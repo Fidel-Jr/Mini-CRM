@@ -31,28 +31,19 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import React, { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
   customerId: z
     .number()
     .min(1, { message: "Customer is required." }),
-  title: z.string().min(1, { message: "Title is required." }),
-  value: z
-    .number()
-    .gt(0, "Value must be greater than 0"),
-  stage:z.enum([
-        "Lead",
-        "Qualified",
-        "Proposal",
-        "Won",
-        "Lost",
-      ]),
+  content: z.string().min(1, { message: "Content is required." }),
 });
 
-type OpportunityForm = z.input<typeof formSchema>;
+type NoteForm = z.input<typeof formSchema>;
 
-async function createOpportunity(data: OpportunityForm) {
-  const response = await fetch("https://localhost:7187/api/Opportunities", {
+async function createNote(data: NoteForm) {
+  const response = await fetch("https://localhost:7187/api/Notes", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -60,7 +51,7 @@ async function createOpportunity(data: OpportunityForm) {
 
   if (!response.ok) {
     const err = await response.json();
-    throw new Error(err.message || err.name || "Failed to create opportunity");
+    throw new Error(err.message || err.name || "Failed to create note");
   }
 
   return response.json();
@@ -84,33 +75,31 @@ async function createOpportunity(data: OpportunityForm) {
     return data.customers;
   }
 
-export function AddOpportunityForm() {
+export function AddNoteForm() {
   const queryClient = useQueryClient();
 
-  const form = useForm<OpportunityForm>({
+  const form = useForm<NoteForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       customerId: 0,
-      title: "",
-      value: 0,
-      stage: "Lead",
+      content: "",
     },
   });
 
   const { data: customers = [], isLoading: customersLoading } = useQuery({
-    queryKey: ["companies"], // renamed, distinct from opportunities
+    queryKey: ["companies"],
     queryFn: getCustomers,
   });
 
 
   const mutation = useMutation({
-    mutationFn: createOpportunity,
+    mutationFn: createNote,
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["opportunities"] });
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
       toast.success(
         <span>Customer created successfully</span>,
         {
-          description: <span className="text-green-600">"{variables.title}" has been added to your opportunities.</span>,
+          description: <span className="text-green-600">Note has been added.</span>,
         }
       );
       form.reset();
@@ -128,7 +117,7 @@ export function AddOpportunityForm() {
     },
   });
 
-  const onSubmit = (data: OpportunityForm) => mutation.mutate(data);
+  const onSubmit = (data: NoteForm) => mutation.mutate(data);
   const isSubmitting = mutation.isPending;
   const [open, setOpen] = useState(false);
   return (
@@ -212,80 +201,24 @@ export function AddOpportunityForm() {
         
         <Controller
           control={form.control}
-          name="title"
+          name="content"
           render={({ field, fieldState }) => (
             <div className="grid gap-3" data-invalid={fieldState.invalid}>
-              <Label htmlFor="opportunity-title" className="text-sm font-semibold text-gray-700">
-                Title
-              </Label>
-              <Input
-                {...field}
-                id="opportunity-title"
-                placeholder="Enter title"
-                autoComplete="title"
-                aria-invalid={fieldState.invalid}
-                className="rounded-lg border-gray-200 focus:border-primary focus:ring-primary h-11"
-              />
-              {fieldState.invalid && (
-                <p className="text-sm text-red-600">{fieldState.error?.message}</p>
-              )}
-            </div>
-          )}
-        />
-
-        <Controller
-          control={form.control}
-          name="value"
-          render={({ field, fieldState }) => (
-            <div className="grid gap-3" data-invalid={fieldState.invalid}>
-              <Label htmlFor="value" className="text-sm font-semibold text-gray-700">
-                Value
-              </Label>
-
-              <Input
-                {...field}
-                id="value"
-                type="number"
-                onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                placeholder="Enter value"
-                aria-invalid={fieldState.invalid}
-                className="rounded-lg border-gray-200 focus:border-primary focus:ring-primary h-11"
-              />
-
-              {fieldState.invalid && (
-                <p className="text-sm text-red-600">
-                  {fieldState.error?.message}
-                </p>
-              )}
-            </div>
-          )}
-        />
-
-        <Controller
-          control={form.control}
-          name="stage"
-          render={({ field, fieldState }) => (
-            <div className="grid gap-3" data-invalid={fieldState.invalid}>
-              <Label className="text-sm font-semibold text-gray-700">
-                Stage
-              </Label>
-
-              <Select
-                value={field.value}
-                onValueChange={field.onChange}
+              <Label
+                htmlFor="note-content"
+                className="text-sm font-semibold text-gray-700"
               >
-                <SelectTrigger className="w-full !h-11 rounded-lg border-gray-200">
-                  <SelectValue placeholder="Select stage" />
-                </SelectTrigger>
+                Content
+              </Label>
 
-                <SelectContent>
-                  <SelectItem value="Lead">Lead</SelectItem>
-                  <SelectItem value="Qualified">Qualified</SelectItem>
-                  <SelectItem value="Proposal">Proposal</SelectItem>
-                  <SelectItem value="Won">Won</SelectItem>
-                  <SelectItem value="Lost">Lost</SelectItem>
-                </SelectContent>
-              </Select>
+              <Textarea
+                {...field}
+                id="note-content"
+                placeholder="Write content"
+                autoComplete="off"
+                aria-invalid={fieldState.invalid}
+                className="rounded-lg border-gray-200 focus:border-primary focus:ring-primary min-h-32"
+              />
 
               {fieldState.invalid && (
                 <p className="text-sm text-red-600">
