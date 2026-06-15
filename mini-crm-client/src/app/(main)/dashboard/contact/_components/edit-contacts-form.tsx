@@ -44,7 +44,7 @@ const formSchema = z.object({
     position: z.string().min(1, { message: "Position is required." }),
 });
 
-type CustomerForm = z.infer<typeof formSchema>;
+type ContactForm = z.infer<typeof formSchema>;
 
 interface Contact {
   id: number;
@@ -55,8 +55,8 @@ interface Contact {
   email: string;
 }
 
-interface EditCustomerSheetProps {
-  customer: Contact;
+interface EditContactSheetProps {
+  contact: Contact;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -65,7 +65,6 @@ type Customer = {
     id: number;
     name: string;
 };
-
 
 async function getCustomers(): Promise<Customer[]> {
     const response = await fetch("https://localhost:7187/api/Customers");
@@ -79,7 +78,7 @@ async function getCustomers(): Promise<Customer[]> {
     return data.customers;
   }
 
-async function updateCustomer(contact: Contact) {
+async function updateContact(contact: Contact) {
   const response = await fetch(`https://localhost:7187/api/contacts/${contact.id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -88,7 +87,7 @@ async function updateCustomer(contact: Contact) {
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
-    throw new Error(err.message || err.name || "Failed to update customer");
+    throw new Error(err.message || err.name || "Failed to update contact");
   }
 
   // Handle 204 No Content or any empty body response
@@ -98,17 +97,17 @@ async function updateCustomer(contact: Contact) {
 
 
 
-export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomerSheetProps) {
+export function EditContactSheet({ contact, open, onOpenChange }: EditContactSheetProps) {
   const queryClient = useQueryClient();
 
-  const form = useForm<CustomerForm>({
+  const form = useForm<ContactForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      customerId: customer.customerId,
-      firstName: customer.firstName,
-      lastName: customer.lastName,
-      position: customer.position,
-      email: customer.email,
+      customerId: contact.customerId,
+      firstName: contact.firstName,
+      lastName: contact.lastName,
+      position: contact.position,
+      email: contact.email,
     },
   });
 
@@ -116,26 +115,25 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
     queryKey: ["customers"], // renamed, distinct from contacts
     queryFn: getCustomers,
   });
-  console.log(customers)
 
   // Sync form when customer prop changes (e.g. opening a different row)
   React.useEffect(() => {
     form.reset({
-      customerId: customer.customerId,
-      firstName: customer.firstName,
-      lastName: customer.lastName,
-      position: customer.position,
-      email: customer.email,
+      customerId: contact.customerId,
+      firstName: contact.firstName,
+      lastName: contact.lastName,
+      position: contact.position,
+      email: contact.email,
     });
-  }, [customer, form]);
+  }, [contact, form]);
 
   const mutation = useMutation({
-    mutationFn: (data: CustomerForm) => updateCustomer({ ...data,
-  id: customer.id,
+    mutationFn: (data: ContactForm) => updateContact({ ...data,
+  id: contact.id,
   lastName: data.lastName ?? "",}),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
-      toast.success("Customer updated successfully", {
+      toast.success("Contact updated successfully", {
         description: (
           <span className="text-green-600">
             "{variables.firstName}" has been updated.
@@ -156,14 +154,14 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
     },
   });
 
-  const onSubmit = (data: CustomerForm) => mutation.mutate(data);
+  const onSubmit = (data: ContactForm) => mutation.mutate(data);
   const isSubmitting = mutation.isPending;
   const [openCombo, setOpenCombo] = React.useState(false);
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange}> 
       <SheetContent className="!w-full sm:!w-[500px] !max-w-none sm:!max-w-none rounded-t-2xl sm:rounded-2xl shadow-xl">
         <SheetHeader className="pb-6 border-b border-gray-100">
-          <SheetTitle className="text-2xl font-bold">Edit Customer</SheetTitle>
+          <SheetTitle className="text-2xl font-bold">Edit Contact</SheetTitle>
           <SheetDescription className="text-gray-600 text-base">
             Update customer information below. Click save when you&apos;re done.
           </SheetDescription>
@@ -248,12 +246,12 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
               name="firstName"
               render={({ field, fieldState }) => (
                 <div className="grid gap-3" data-invalid={fieldState.invalid}>
-                  <Label htmlFor="edit-customer-industry" className="text-sm font-semibold text-gray-700">
+                  <Label htmlFor="edit-contact-industry" className="text-sm font-semibold text-gray-700">
                     First Name
                   </Label>
                   <Input
                     {...field}
-                    id="edit-customer-industry"
+                    id="edit-contact-industry"
                     placeholder="Enter firstname"
                     autoComplete="off"
                     aria-invalid={fieldState.invalid}
@@ -271,12 +269,12 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
               name="lastName"
               render={({ field, fieldState }) => (
                 <div className="grid gap-3" data-invalid={fieldState.invalid}>
-                  <Label htmlFor="edit-customer-website" className="text-sm font-semibold text-gray-700">
+                  <Label htmlFor="edit-contact-website" className="text-sm font-semibold text-gray-700">
                     Last Name
                   </Label>
                   <Input
                     {...field}
-                    id="edit-customer-website"
+                    id="edit-contact-website"
                     type="url"
                     placeholder="Enter lastname"
                     autoComplete="url"
@@ -295,12 +293,12 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
               name="email"
               render={({ field, fieldState }) => (
                 <div className="grid gap-3" data-invalid={fieldState.invalid}>
-                  <Label htmlFor="edit-customer-email" className="text-sm font-semibold text-gray-700">
+                  <Label htmlFor="edit-contact-email" className="text-sm font-semibold text-gray-700">
                     Email
                   </Label>
                   <Input
                     {...field}
-                    id="edit-customer-email"
+                    id="edit-contact-email"
                     type="email"
                     placeholder="you@example.com"
                     autoComplete="email"
@@ -319,12 +317,12 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
               name="position"
               render={({ field, fieldState }) => (
                 <div className="grid gap-3" data-invalid={fieldState.invalid}>
-                  <Label htmlFor="edit-customer-phone" className="text-sm font-semibold text-gray-700">
+                  <Label htmlFor="edit-contact-phone" className="text-sm font-semibold text-gray-700">
                     Position
                   </Label>
                   <Input
                     {...field}
-                    id="edit-customer-phone"
+                    id="edit-contact-phone"
                     placeholder="Enter position"
                     autoComplete="off"
                     aria-invalid={fieldState.invalid}

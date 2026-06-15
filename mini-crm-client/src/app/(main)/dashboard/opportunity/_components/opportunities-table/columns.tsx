@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
-import type { ContactRow } from "./schema";
-import { EditContactSheet } from "../edit-contacts-form";
+import type { OpportunityRow } from "./schema";
+import { EditOpportunitySheet } from "../edit-opportunity-form";
 import React from "react";
 
 const healthStripSlots = Array.from({ length: 18 }, (_, index) => ({
@@ -33,7 +33,7 @@ const healthStripSlots = Array.from({ length: 18 }, (_, index) => ({
 //   }
 // }
 
-export const contactsColumns: ColumnDef<ContactRow>[] = [
+export const opportunitiesColumns: ColumnDef<OpportunityRow>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -47,7 +47,7 @@ export const contactsColumns: ColumnDef<ContactRow>[] = [
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label={`Select ${row.original.firstName}`}
+        aria-label={`Select ${row.original.id}`}
       />
     ),
     enableHiding: false,
@@ -55,7 +55,7 @@ export const contactsColumns: ColumnDef<ContactRow>[] = [
   {
     accessorKey: "id",
     header: "ID",
-    cell: ({ row }) => <div className="text-sm tracking-tight">{"CN-" + row.original.id}</div>,
+    cell: ({ row }) => <div className="text-sm tracking-tight">{"OP-" + row.original.id}</div>,
     enableHiding: false,
   },
   {
@@ -68,29 +68,27 @@ export const contactsColumns: ColumnDef<ContactRow>[] = [
     ),
   },
   {
-    accessorKey: "firstName",
-    header: "First Name",
-    cell: ({ row }) => <div className="font-medium text-sm">{row.original.firstName}</div>,
+    accessorKey: "title",
+    header: "Title",
+    cell: ({ row }) => <div className="font-medium text-sm">{row.original.title}</div>,
   },
   {
-    accessorKey: "lastName",
-    header: "Last Name",
-    cell: ({ row }) => <div className="text-sm">{row.original.lastName || "No Lastname"}</div>,
+    accessorKey: "value",
+    header: "Value",
+    cell: ({ row }) => (
+      <div className="text-sm">
+        {new Intl.NumberFormat("en-US").format(row.original.value)}
+      </div>
+    ),
   },
   {
-    accessorKey: "position",
-    header: "Position",
+    accessorKey: "stage",
+    header: "Stage",
     cell: ({ row }) => (
       <Badge variant="outline" className="rounded-full px-2.5">
-        {row.original.position}
+        {row.original.stage}
       </Badge>
     ),
-    filterFn: "equalsString",
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-    cell: ({ row }) => <div className="text-sm">{row.original.email}</div>,
     filterFn: "equalsString",
   },
   
@@ -116,8 +114,8 @@ export const contactsColumns: ColumnDef<ContactRow>[] = [
           </div>
 
           {isOpen && (
-            <EditContactSheet
-              contact={row.original}
+            <EditOpportunitySheet
+              opportunity={row.original}
               open={isOpen}
               onOpenChange={setIsOpen}
             />

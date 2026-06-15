@@ -11,13 +11,12 @@ import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-} from "@/components/ui/combobox";
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import {
   Command,
   CommandEmpty,
@@ -37,16 +36,23 @@ const formSchema = z.object({
   customerId: z
     .number()
     .min(1, { message: "Customer is required." }),
-  firstName: z.string().min(1, { message: "First Name is required." }),
-  lastName: z.string().optional().or(z.literal("")),
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  position: z.string().min(1, { message: "Position is required." }),
+  title: z.string().min(1, { message: "Title is required." }),
+  value: z
+    .number()
+    .gt(0, "Value must be greater than 0"),
+  stage:z.enum([
+        "Lead",
+        "Qualified",
+        "Proposal",
+        "Won",
+        "Lost",
+      ]),
 });
 
-type ContactForm = z.infer<typeof formSchema>;
+type OpportunityForm = z.input<typeof formSchema>;
 
-async function createContact(data: ContactForm) {
-  const response = await fetch("https://localhost:7187/api/Contacts", {
+async function createOpportunity(data: OpportunityForm) {
+  const response = await fetch("https://localhost:7187/api/Opportunities", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -54,7 +60,7 @@ async function createContact(data: ContactForm) {
 
   if (!response.ok) {
     const err = await response.json();
-    throw new Error(err.message || err.name || "Failed to create customer");
+    throw new Error(err.message || err.name || "Failed to create opportunity");
   }
 
   return response.json();
@@ -73,38 +79,38 @@ async function createContact(data: ContactForm) {
     }
 
     const data = await response.json();
+    console.log(data);
 
     return data.customers;
   }
 
-export function AddContactForm() {
+export function AddOpportunityForm() {
   const queryClient = useQueryClient();
 
-  const form = useForm<ContactForm>({
+  const form = useForm<OpportunityForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       customerId: 0,
-      firstName: "",
-      lastName: "",
-      email: "",
-      position: "",
+      title: "",
+      value: 0,
+      stage: "Lead",
     },
   });
 
   const { data: customers = [], isLoading: customersLoading } = useQuery({
-    queryKey: ["companies"], // renamed, distinct from contacts
+    queryKey: ["companies"], // renamed, distinct from opportunities
     queryFn: getCustomers,
   });
 
 
   const mutation = useMutation({
-    mutationFn: createContact,
+    mutationFn: createOpportunity,
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+      queryClient.invalidateQueries({ queryKey: ["opportunities"] });
       toast.success(
         <span>Customer created successfully</span>,
         {
-          description: <span className="text-green-600">"{variables.firstName}" has been added to your contacts.</span>,
+          description: <span className="text-green-600">"{variables.title}" has been added to your opportunities.</span>,
         }
       );
       form.reset();
@@ -122,7 +128,7 @@ export function AddContactForm() {
     },
   });
 
-  const onSubmit = (data: ContactForm) => mutation.mutate(data);
+  const onSubmit = (data: OpportunityForm) => mutation.mutate(data);
   const isSubmitting = mutation.isPending;
   const [open, setOpen] = useState(false);
   return (
@@ -206,15 +212,15 @@ export function AddContactForm() {
         
         <Controller
           control={form.control}
-          name="firstName"
+          name="title"
           render={({ field, fieldState }) => (
             <div className="grid gap-3" data-invalid={fieldState.invalid}>
-              <Label htmlFor="contact-person-firstname" className="text-sm font-semibold text-gray-700">
-                First Name
+              <Label htmlFor="opportunity-person-firstname" className="text-sm font-semibold text-gray-700">
+                Title
               </Label>
               <Input
                 {...field}
-                id="contact-person-firstname"
+                id="opportunity-person-firstname"
                 placeholder="Enter firstname"
                 autoComplete="firstName"
                 aria-invalid={fieldState.invalid}
@@ -229,22 +235,27 @@ export function AddContactForm() {
 
         <Controller
           control={form.control}
-          name="lastName"
+          name="value"
           render={({ field, fieldState }) => (
             <div className="grid gap-3" data-invalid={fieldState.invalid}>
-              <Label htmlFor="contact-person-lastname" className="text-sm font-semibold text-gray-700">
-                Last Name
+              <Label htmlFor="value" className="text-sm font-semibold text-gray-700">
+                Value
               </Label>
+
               <Input
                 {...field}
-                id="contact-person-lastname"
-                placeholder="Enter lastname"
-                autoComplete="off"
+                id="value"
+                type="number"
+                onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                placeholder="Enter value"
                 aria-invalid={fieldState.invalid}
                 className="rounded-lg border-gray-200 focus:border-primary focus:ring-primary h-11"
               />
+
               {fieldState.invalid && (
-                <p className="text-sm text-red-600">{fieldState.error?.message}</p>
+                <p className="text-sm text-red-600">
+                  {fieldState.error?.message}
+                </p>
               )}
             </div>
           )}
@@ -252,51 +263,39 @@ export function AddContactForm() {
 
         <Controller
           control={form.control}
-          name="email"
+          name="stage"
           render={({ field, fieldState }) => (
             <div className="grid gap-3" data-invalid={fieldState.invalid}>
-              <Label htmlFor="customer-email" className="text-sm font-semibold text-gray-700">
-                Email
+              <Label className="text-sm font-semibold text-gray-700">
+                Stage
               </Label>
-              <Input
-                {...field}
-                id="customer-email"
-                type="email"
-                placeholder="you@example.com"
-                autoComplete="email"
-                aria-invalid={fieldState.invalid}
-                className="rounded-lg border-gray-200 focus:border-primary focus:ring-primary h-11"
-              />
+
+              <Select
+                value={field.value}
+                onValueChange={field.onChange}
+              >
+                <SelectTrigger className="w-full !h-11 rounded-lg border-gray-200">
+                  <SelectValue placeholder="Select stage" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectItem value="Lead">Lead</SelectItem>
+                  <SelectItem value="Qualified">Qualified</SelectItem>
+                  <SelectItem value="Proposal">Proposal</SelectItem>
+                  <SelectItem value="Won">Won</SelectItem>
+                  <SelectItem value="Lost">Lost</SelectItem>
+                </SelectContent>
+              </Select>
+
               {fieldState.invalid && (
-                <p className="text-sm text-red-600">{fieldState.error?.message}</p>
+                <p className="text-sm text-red-600">
+                  {fieldState.error?.message}
+                </p>
               )}
             </div>
           )}
         />
 
-        <Controller
-          control={form.control}
-          name="position"
-          render={({ field, fieldState }) => (
-            <div className="grid gap-3" data-invalid={fieldState.invalid}>
-              <Label htmlFor="contact-person-position" className="text-sm font-semibold text-gray-700">
-                Phone
-              </Label>
-              <Input
-                {...field}
-                id="contact-person-position"
-                type="text"
-                placeholder="Enter position"
-                autoComplete="off"
-                aria-invalid={fieldState.invalid}
-                className="rounded-lg border-gray-200 focus:border-primary focus:ring-primary h-11"
-              />
-              {fieldState.invalid && (
-                <p className="text-sm text-red-600">{fieldState.error?.message}</p>
-              )}
-            </div>
-          )}
-        />
       </div>
 
       <SheetFooter className="pt-6 border-t border-gray-100 gap-3">

@@ -1,5 +1,5 @@
 import React from 'react'
-import { CustomersSection } from './_components/opportunities-section'
+import { ContactsSection } from './_components/contacts-section'
 import { Button } from '@/components/ui/button'
 import { SheetForm } from './_components/add-contact'
 
@@ -14,7 +14,7 @@ const Page = () => {
             <SheetForm />
             {/* <Button className='py-5 px-4'>Add Customer</Button> */}
         </div>
-        <CustomersSection />
+        <ContactsSection />
     </>
     
   )

@@ -26,6 +26,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import type { NavGroup, NavMainItem } from "@/navigation/sidebar/sidebar-items";
+import { useQuickCreate } from "@/app/quick-create-provider";
 
 interface NavMainProps {
   readonly items: readonly NavGroup[];
@@ -144,7 +145,7 @@ const NavItemCollapsed = ({
 export function NavMain({ items }: NavMainProps) {
   const path = usePathname();
   const { state, isMobile } = useSidebar();
-
+  
   const isItemActive = (url: string, subItems?: NavMainItem["subItems"]) => {
     if (subItems?.length) {
       return subItems.some((sub) => path.startsWith(sub.url));
@@ -155,20 +156,42 @@ export function NavMain({ items }: NavMainProps) {
   const isSubmenuOpen = (subItems?: NavMainItem["subItems"]) => {
     return subItems?.some((sub) => path.startsWith(sub.url)) ?? false;
   };
-
+  const { openSheet } = useQuickCreate();
   return (
     <>
       <SidebarGroup>
         <SidebarGroupContent className="flex flex-col gap-2">
           <SidebarMenu>
             <SidebarMenuItem className="flex items-center gap-2">
-              <SidebarMenuButton
-                tooltip="Quick Create"
-                className="min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
-              >
-                <PlusCircleIcon />
-                <span>Quick Create</span>
-              </SidebarMenuButton>
+              <DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <SidebarMenuButton
+      tooltip="Quick Create"
+      className="min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
+    >
+      <PlusCircleIcon />
+      <span>Quick Create</span>
+    </SidebarMenuButton>
+  </DropdownMenuTrigger>
+
+  <DropdownMenuContent
+    align="start"
+    side="right"
+    className="w-48"
+  >
+    <DropdownMenuItem onClick={() => openSheet("customer")}>
+      Add Customer
+    </DropdownMenuItem>
+
+    <DropdownMenuItem onClick={() => openSheet("contact")}>
+      Add Contact
+    </DropdownMenuItem>
+
+    <DropdownMenuItem onClick={() => openSheet("opportunity")}>
+      Add Opportunity
+    </DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
               <Button
                 size="icon"
                 className="h-9 w-9 shrink-0 group-data-[collapsible=icon]:opacity-0"

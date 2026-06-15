@@ -52,22 +52,22 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { customersColumns } from "./contacts-table/columns";
-import { customersSchema } from "./contacts-table/schema";
+import { contactsColumns } from "./contacts-table/columns";
+import { contactsSchema } from "./contacts-table/schema";
 
 
 async function fetchContacts() {
   const response = await fetch("https://localhost:7187/api/Contacts");
-  if (!response.ok) throw new Error(`Failed to fetch customers: ${response.status}`);
+  if (!response.ok) throw new Error(`Failed to fetch contacts: ${response.status}`);
   return response.json();
 }
 
-export function CustomersSection() {
+export function ContactsSection() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["contacts"], // renamed
     queryFn: fetchContacts,
     select: (data) => ({
-      contacts: customersSchema.parse(data),
+      contacts: contactsSchema.parse(data),
       industries: [],
     }),
   });
@@ -96,7 +96,7 @@ export function CustomersSection() {
 
   const table = useReactTable({
     data: contacts,
-    columns: customersColumns,
+    columns: contactsColumns,
     state: {
       rowSelection,
       columnFilters,
@@ -139,15 +139,15 @@ export function CustomersSection() {
     <section>
       <Card>
         <CardHeader>
-          <CardTitle className="leading-none">Recent Customers</CardTitle>
+          <CardTitle className="leading-none">Recent Contacts</CardTitle>
           <CardDescription>
-            Track customers across manufacturing, logistics, and other industries.
+            Track contacts across manufacturing, logistics, and other industries.
           </CardDescription>
           <CardAction>
             <div className="flex items-center gap-2">
               <Input
                 className="h-7 w-44 md:w-52"
-                placeholder="Search customers..."
+                placeholder="Search contacts..."
                 value={searchQuery}
                 onChange={(event) => {
                   table.setGlobalFilter(event.target.value || undefined);
@@ -186,7 +186,7 @@ export function CustomersSection() {
         <CardContent className="flex flex-col gap-4 px-0">
           {isLoading && (
             <div className="h-24 text-center text-muted-foreground flex items-center justify-center">
-              Loading customers...
+              Loading contacts...
             </div>
           )}
           {error && (
@@ -240,7 +240,7 @@ export function CustomersSection() {
               </div>
               <div className="flex items-center justify-between gap-4 px-4 pb-1">
                 <p className="text-muted-foreground text-sm">
-                  Viewing {visibleCustomerCount} out of {filteredCustomerCount.toLocaleString()} customers
+                  Viewing {visibleCustomerCount} out of {filteredCustomerCount.toLocaleString()} contacts
                 </p>
                 <Pagination className="mx-0 w-auto justify-end">
                   <PaginationContent className="gap-1.5">

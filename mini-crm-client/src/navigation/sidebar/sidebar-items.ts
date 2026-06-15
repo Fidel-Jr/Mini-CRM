@@ -113,7 +113,7 @@ export const sidebarItems: NavGroup[] = [
       },
       {
         title: "Opportunities",
-        url: "/dashboard/coming-soon",
+        url: "/dashboard/opportunity",
         icon: Calendar,
       },
       {
