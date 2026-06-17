@@ -156,12 +156,12 @@ export const sidebarItems: NavGroup[] = [
     items: [
       {
         title: "Knowledge Base",
-        url: "/dashboard/default-v1",
+        url: "/dashboard/knowledge-base",
         icon: Brain,
       },
       {
         title: "AI Assistant",
-        url: "/dashboard/default-v1",
+        url: "/dashboard/ai-chat",
         icon: Bot,
       },
     ],
@@ -172,7 +172,7 @@ export const sidebarItems: NavGroup[] = [
     items: [
       {
         title: "Users",
-        url: "/dashboard/coming-soon",
+        url: "/dashboard/users",
         icon: Users,
       },
       {

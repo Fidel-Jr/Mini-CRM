@@ -1,9 +1,9 @@
 // app/opportunities/page.tsx
 import React from 'react'
 import { Button } from '@/components/ui/button'
-import { SheetForm } from './_components/add-opportunity'
+import { SheetForm } from './_components/add-note'
 import { Plus } from 'lucide-react'
-import { OpportunitiesSection } from './_components/opportunities-section'
+import { NotesSection } from './_components/notes-section'
 
 const Page = () => {
 
@@ -15,9 +15,8 @@ const Page = () => {
               <span className='text-muted-foreground text-sm'>Manage customers notes</span>
           </div>
           <SheetForm />
-          {/* <Button className='py-5 px-4'>Add Customer</Button> */}
       </div>
-      <OpportunitiesSection />
+      <NotesSection />
     </>
   )
 }
