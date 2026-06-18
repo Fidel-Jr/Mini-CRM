@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MiniCRM.Server.Data;
 using MiniCRM.Server.DTOs;
 using MiniCRM.Server.Entities;
+using MiniCRM.Server.Enums;
 using MiniCRM.Server.Services;
 
 namespace MiniCRM.Server.Controllers
@@ -101,7 +103,7 @@ namespace MiniCRM.Server.Controllers
                     ProfileImage = user.ProfileImage!
                 });
             }
-            return Ok( new {userDtos});
+            return Ok(new { userDtos });
         }
 
         [HttpGet("roles")]
@@ -114,31 +116,27 @@ namespace MiniCRM.Server.Controllers
             return Ok(roles);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(string id, UpdateUserDto request)
+        [Authorize]
+        [HttpPut("profile")]
+        public async Task<IActionResult> UpdateProfile([FromForm] UpdateProfileDto request)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.GetUserAsync(User);
 
-            if (user == null)
+            if (user is null)
             {
-                return NotFound(new
-                {
-                    Message = "User not found."
-                });
+                return Unauthorized();
             }
 
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
-            user.JoinedDate = request.JoinedDate;
-            user.Status = request.Status;
 
-            // Update email
-            if (!string.IsNullOrWhiteSpace(request.Email) &&
-                user.Email != request.Email)
+            // Email
+            if (user.Email != request.Email)
             {
                 var existingUser = await _userManager.FindByEmailAsync(request.Email);
 
-                if (existingUser != null && existingUser.Id != user.Id)
+                if (existingUser != null &&
+                    existingUser.Id != user.Id)
                 {
                     return BadRequest(new
                     {
@@ -161,47 +159,142 @@ namespace MiniCRM.Server.Controllers
                 user.ProfileImage = imageName;
             }
 
-            if (!string.IsNullOrWhiteSpace(request.Role))
-            {
-                var roleExists = await _roleManager.RoleExistsAsync(request.Role);
+            var result = await _userManager.UpdateAsync(user);
 
-                if (!roleExists)
+            if (!result.Succeeded)
+            {
+                return BadRequest(
+                    result.Errors.Select(e => e.Description));
+            }
+
+            // Password
+            if (!string.IsNullOrWhiteSpace(request.Password))
+            {
+                var token = await _userManager
+                    .GeneratePasswordResetTokenAsync(user);
+
+                var passwordResult =
+                    await _userManager.ResetPasswordAsync(
+                        user,
+                        token,
+                        request.Password);
+
+                if (!passwordResult.Succeeded)
+                {
+                    return BadRequest(
+                        passwordResult.Errors
+                            .Select(e => e.Description));
+                }
+            }
+
+            return Ok(new
+            {
+                Message = "Profile updated successfully."
+            });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(
+        string id,
+        [FromForm] UpdateUserDto request)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user is null)
+            {
+                return NotFound(new
+                {
+                    Message = "User not found."
+                });
+            }
+
+            user.FirstName = request.FirstName;
+            user.LastName = request.LastName;
+            user.JoinedDate = request.JoinedDate;
+            user.Status = request.Status;
+
+            // Email
+            if (user.Email != request.Email)
+            {
+                var existingUser = await _userManager
+                    .FindByEmailAsync(request.Email);
+
+                if (existingUser != null &&
+                    existingUser.Id != user.Id)
                 {
                     return BadRequest(new
                     {
-                        Message = "Invalid role."
+                        Message = "Email already exists."
                     });
                 }
 
-                var currentRoles = await _userManager.GetRolesAsync(user);
+                user.Email = request.Email;
+                user.UserName = request.Email;
+            }
 
-                if (!currentRoles.Contains(request.Role))
+            // Profile Image
+            if (request.ProfileImage is not null)
+            {
+                await _fileUploadService.DeleteImageAsync(user.ProfileImage);
+
+                var imageName = await _fileUploadService
+                    .SaveImageAsync(request.ProfileImage);
+
+                user.ProfileImage = imageName;
+            }
+
+            // Role
+            var roleExists = await _roleManager
+                .RoleExistsAsync(request.Role);
+
+            if (!roleExists)
+            {
+                return BadRequest(new
                 {
-                    await _userManager.RemoveFromRolesAsync(user, currentRoles);
-                    await _userManager.AddToRoleAsync(user, request.Role);
-                }
+                    Message = "Invalid role."
+                });
+            }
+
+            var currentRoles =
+                await _userManager.GetRolesAsync(user);
+
+            if (!currentRoles.Contains(request.Role))
+            {
+                await _userManager.RemoveFromRolesAsync(
+                    user,
+                    currentRoles);
+
+                await _userManager.AddToRoleAsync(
+                    user,
+                    request.Role);
             }
 
             var result = await _userManager.UpdateAsync(user);
 
             if (!result.Succeeded)
             {
-                return BadRequest(result.Errors.Select(e => e.Description));
+                return BadRequest(
+                    result.Errors.Select(e => e.Description));
             }
 
-            // Update password
+            // Password
             if (!string.IsNullOrWhiteSpace(request.Password))
             {
-                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var token = await _userManager
+                    .GeneratePasswordResetTokenAsync(user);
 
-                var passwordResult = await _userManager.ResetPasswordAsync(
-                    user,
-                    token,
-                    request.Password);
+                var passwordResult =
+                    await _userManager.ResetPasswordAsync(
+                        user,
+                        token,
+                        request.Password);
 
                 if (!passwordResult.Succeeded)
                 {
-                    return BadRequest(passwordResult.Errors.Select(e => e.Description));
+                    return BadRequest(
+                        passwordResult.Errors
+                            .Select(e => e.Description));
                 }
             }
 
@@ -211,5 +304,40 @@ namespace MiniCRM.Server.Controllers
             });
         }
 
+        [HttpPatch("{id}/deactivate")]
+        public async Task<IActionResult> DeactivateUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user is null)
+            {
+                return NotFound(new
+                {
+                    Message = "User not found."
+                });
+            }
+
+            if (user.Status == UserStatus.Deactivated)
+            {
+                return BadRequest(new
+                {
+                    Message = "User is already deactivated."
+                });
+            }
+
+            user.Status = UserStatus.Deactivated;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors.Select(e => e.Description));
+            }
+
+            return Ok(new
+            {
+                Message = "User deactivated successfully."
+            });
+        }
     }
 }
