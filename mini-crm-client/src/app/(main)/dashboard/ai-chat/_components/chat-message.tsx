@@ -1,54 +1,45 @@
-import { Sparkles } from "lucide-react";
+import { Message } from '../../../../../../types/chat';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from "remark-gfm";
+import rehypeRaw from 'rehype-raw';
+import rehypeHighlight from 'rehype-highlight';
 
-export default function ChatMessage() {
+interface Props {
+  message: Message;
+}
+
+
+export default function ChatMessage({ message }: Props) {
+  const isUser = message.role === 'user';
+
   return (
-    <div className="flex gap-4">
-      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-        <Sparkles className="h-5 w-5 text-primary" />
-      </div>
-
+    <div
+      className={
+        isUser
+          ? 'flex justify-end'
+          : 'flex justify-start'
+      }
+    >
       <div
-        className="
-            flex-1
-            min-w-0
-            border
-            rounded-xl
-            p-5
-            max-w-full
-            sm:max-w-lg
-            lg:max-w-2xl
-        "
-        >
-        <p className="font-medium mb-3">
-          Priority support is included in the following plans:
-        </p>
-
-        <ul className="list-disc pl-5 space-y-1 mb-4">
-          <li>Enterprise Plan</li>
-          <li>Premium Plan</li>
-        </ul>
-
-        <p className="text-sm text-muted-foreground mb-4">
-          These plans include 24/7 support, dedicated account managers,
-          and priority response times.
-        </p>
-
-        <div className="text-sm font-medium">
-          Source: Support Policy.pdf
-        </div>
-
-        <div className="flex gap-3 mt-4">
-          <button className="text-muted-foreground hover:text-foreground">
-            👍
-          </button>
-
-          <button className="text-muted-foreground hover:text-foreground">
-            👎
-          </button>
-
-          <button className="text-muted-foreground hover:text-foreground">
-            📋
-          </button>
+        className={`
+          max-w-[80%]
+          rounded-xl
+          p-4
+          break-words
+          ${
+            isUser
+              ? 'bg-primary text-primary-foreground'
+              : 'border'
+          }
+        `}
+      >
+        <div className="prose prose-sm dark:prose-invert max-w-none">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw, rehypeHighlight]}
+          >
+            {message.content}
+          </ReactMarkdown>
         </div>
       </div>
     </div>

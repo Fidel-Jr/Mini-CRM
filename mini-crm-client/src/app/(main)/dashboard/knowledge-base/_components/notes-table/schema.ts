@@ -3,7 +3,7 @@ import z from "zod";
 export const noteSchema = z.object({
   id: z.number(),
   fileName: z.string(),
-  fileType: z.string(),
+  extension: z.string(),
   uploadedAt: z.string(),
 });
 

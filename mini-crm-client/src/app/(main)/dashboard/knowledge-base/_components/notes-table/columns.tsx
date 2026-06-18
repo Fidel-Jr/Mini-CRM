@@ -2,7 +2,7 @@
 "use no memo";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { Pencil } from "lucide-react";
+import { Download, Pencil } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -68,11 +68,11 @@ export const notesColumns: ColumnDef<NoteRow>[] = [
     ),
   },
   {
-    accessorKey: "fileType",
-    header: "Type",
+    accessorKey: "extension",
+    header: "Extension",
     cell: ({ row }) => (
       <div className="max-w-xl truncate text-sm font-medium">
-        {row.original.fileType.toUpperCase()}
+        {row.original.extension.toUpperCase()}
       </div>
     ),
   },
@@ -89,33 +89,31 @@ export const notesColumns: ColumnDef<NoteRow>[] = [
   
   {
     id: "actions",
-    header: () => <div className="text-right">Edit</div>,
+    header: () => <div className="text-right">Download</div>,
     cell: ({ row }) => {
-      const [isOpen, setIsOpen] = React.useState(false);
-      const customer = row.original;
+      const document = row.original;
+
+      const handleDownload = () => {
+        window.open(
+          `https://localhost:7187/api/Documents/${document.id}/download`,
+          "_blank"
+        );
+      };
 
       return (
-        <>
-          <div className="text-right">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-8 rounded-full text-muted-foreground hover:bg-transparent focus-visible:bg-transparent"
-              onClick={() => setIsOpen(true)}
-            >
-              <Pencil />
-              <span className="sr-only">Edit customer</span>
-            </Button>
-          </div>
-
-          {/* {isOpen && (
-            <EditNoteSheet
-              note={row.original}
-              open={isOpen}
-              onOpenChange={setIsOpen}
-            />
-          )} */}
-        </>
+        <div className="text-right">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-8 rounded-full text-muted-foreground hover:bg-transparent focus-visible:bg-transparent"
+            onClick={handleDownload}
+          >
+            <Download className="size-4" />
+            <span className="sr-only">
+              Download {document.fileName}
+            </span>
+          </Button>
+        </div>
       );
     },
     enableHiding: false,

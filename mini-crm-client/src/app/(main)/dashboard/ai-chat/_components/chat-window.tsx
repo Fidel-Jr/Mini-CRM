@@ -1,31 +1,45 @@
-import ChatInput from "./chat-input";
-import ChatMessage from "./chat-message";
+'use client';
+
+import { useEffect, useRef } from 'react';
+import { useChat } from '../../../../../../contexts/chat-context';
+
+import ChatInput from './chat-input';
+import ChatMessage from './chat-message';
 
 export default function ChatWindow() {
-  return (
-    <div className="border rounded-xl bg-card flex flex-col h-[600px] lg:h-[calc(100vh-220px)] overflow-hidden">
-      <div className="flex-1 overflow-y-auto p-6">
-        <div className="flex justify-end mb-6">
-          <div
-            className="
-                bg-primary/10
-                text-sm
-                px-4
-                py-3
-                rounded-2xl
-                max-w-[85%]
-                sm:max-w-[70%]
-                break-words
-            "
-            >
-            Which plans include priority support?
-          </div>
+    const {
+        messages,
+        loading
+    } = useChat();
+
+    const bottomRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({
+            behavior: 'smooth'
+        });
+    }, [messages]);
+
+    return (
+        <div className="border rounded-xl bg-card flex flex-col h-[600px] lg:h-[calc(100vh-190px)] overflow-hidden">
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+                {messages.map(message => (
+                    <ChatMessage
+                        key={message.id}
+                        message={message}
+                    />
+                ))}
+
+                {loading && (
+                    <div className="text-sm text-muted-foreground">
+                        Thinking...
+                    </div>
+                )}
+
+                <div ref={bottomRef} />
+            </div>
+
+            <ChatInput />
         </div>
-
-        <ChatMessage />
-      </div>
-
-      <ChatInput />
-    </div>
-  );
+    );
 }

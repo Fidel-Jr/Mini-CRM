@@ -78,7 +78,7 @@ export function DocumentSection() {
   const unique = new Set<string>();
 
   notes.forEach((c) => {
-      if (c.fileType) unique.add(c.fileType);
+      if (c.extension) unique.add(c.extension);
     });
 
     return ["all", ...Array.from(unique)];
@@ -118,7 +118,7 @@ export function DocumentSection() {
 
   const searchQuery = table.getState().globalFilter ?? "";
   const customerFilter =
-  (table.getColumn("fileName")?.getFilterValue() as string) ?? "all";
+  (table.getColumn("extension")?.getFilterValue() as string) ?? "all";
   const currentPage = table.getState().pagination.pageIndex + 1;
   const pageCount = table.getPageCount();
   const filteredCustomerCount = table.getFilteredRowModel().rows.length;
@@ -166,7 +166,7 @@ export function DocumentSection() {
                   <DropdownMenuRadioGroup
                     value={customerFilter}
                     onValueChange={(value) => {
-                      table.getColumn("fileName")?.setFilterValue(
+                      table.getColumn("extension")?.setFilterValue(
                         value === "all" ? undefined : value
                       );
                       table.setPageIndex(0);

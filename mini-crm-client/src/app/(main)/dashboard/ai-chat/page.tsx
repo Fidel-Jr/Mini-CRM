@@ -1,6 +1,7 @@
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import AssistantLayout from './_components/assistant-layout'
+import { ChatProvider } from '../../../../../contexts/chat-context'
 
 const Page = () => {
   return (
@@ -11,8 +12,9 @@ const Page = () => {
             Your AI powered assistant
             </p>
         </div>
-
+        <ChatProvider>
         <AssistantLayout />
+        </ChatProvider>
     </div>
     
   )
