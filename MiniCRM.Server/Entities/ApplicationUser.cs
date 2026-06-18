@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using MiniCRM.Server.Enums;
 
 namespace MiniCRM.Server.Entities
 {
@@ -8,5 +9,9 @@ namespace MiniCRM.Server.Entities
 
         public string LastName { get; set; } = string.Empty;
         public string? ProfileImage { get; set; }
+
+        public UserStatus Status { get; set; } = UserStatus.Active;
+
+        public DateOnly JoinedDate { get; set; }
     }
 }

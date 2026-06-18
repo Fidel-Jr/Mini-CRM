@@ -1,13 +1,21 @@
+using MiniCRM.Services;
+using MiniCRM.Services;
+using MiniCRM.Services.Ingestion;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.AI;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using MiniCRM.Server.Data;
 using MiniCRM.Server.Entities;
 using MiniCRM.Server.Seeders;
 using MiniCRM.Server.Services;
+using OpenAI;
+using OpenAI.Chat;
+using System.ClientModel;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +23,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter());
+    });
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
@@ -92,6 +105,33 @@ builder.Services.AddCors(options =>
     );
 });
 
+var credential = new ApiKeyCredential(builder.Configuration["OpenAi:Key"] ?? throw new InvalidOperationException("Missing configuration: GitHubModels:Token. See the README for details."));
+var openAIOptions = new OpenAIClientOptions()
+{
+    Endpoint = new Uri("https://openrouter.ai/api/v1")
+};
+
+var ghModelsClient = new OpenAIClient(credential, openAIOptions);
+var chatClient = ghModelsClient.GetChatClient("openai/gpt-4o-mini").AsIChatClient();
+var embeddingGenerator = ghModelsClient.GetEmbeddingClient("openai/text-embedding-3-small").AsIEmbeddingGenerator();
+
+var testEmbedding = await embeddingGenerator.GenerateAsync("policies");
+Console.WriteLine($"Embedding dims: {testEmbedding.Vector.Length}");
+Console.WriteLine($"First 5 values: {string.Join(", ", testEmbedding.Vector.ToArray().Take(5))}");
+
+var vectorStorePath = Path.Combine(AppContext.BaseDirectory, "vector-store.db");
+var vectorStoreConnectionString = $"Data Source={vectorStorePath}";
+builder.Services.AddSqliteVectorStore(_ => vectorStoreConnectionString);
+builder.Services.AddSqliteCollection<Guid, IngestedChunk>(IngestedChunk.CollectionName, vectorStoreConnectionString);
+builder.Services.AddSingleton<DataIngestor>();
+builder.Services.AddSingleton<SemanticSearch>();
+builder.Services.AddKeyedSingleton("ingestion_directory", new DirectoryInfo(Path.Combine(builder.Environment.WebRootPath, "Data")));
+builder.Services.AddChatClient(chatClient).UseFunctionInvocation().UseLogging();
+builder.Services.AddEmbeddingGenerator(embeddingGenerator);
+builder.Services.AddScoped<ChatService>();
+
+// Image Upload Service
+builder.Services.AddScoped<FileUploadService>();
 
 var app = builder.Build();
 

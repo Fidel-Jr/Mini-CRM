@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MiniCRM.Server.Data;
 using MiniCRM.Server.DTOs;
 using MiniCRM.Server.Entities;
@@ -15,6 +16,22 @@ namespace MiniCRM.Server.Controllers
         public NotesController(AppDbContext context)
         {
             _context = context;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var notes = await _context.Notes
+                .OrderByDescending(n => n.CreatedAt)
+                .Select(n => new
+                {
+                    Id = n.Id,
+                    Content = n.Content,
+                    CustomerId = n.CustomerId,
+                    CustomerName = n.Customer != null ? n.Customer.Name : ""
+                })
+                .ToListAsync();
+            return Ok(notes);
         }
 
         [HttpPost]

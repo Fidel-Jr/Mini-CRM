@@ -28,50 +28,7 @@ namespace MiniCRM.Server.Controllers
             _jwtService = jwtService;
             _context = context;
         }
-
-        [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterDto request)
-        {
-
-            if(!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var existingUser = await _userManager.FindByEmailAsync(request.Email);
-
-            if (existingUser is not null)
-            {
-                return BadRequest(new
-                {
-                    Message = "Email already exists."
-                });
-            }
-
-            var user = new ApplicationUser
-            {
-                UserName = request.Email,
-                Email = request.Email,
-                FirstName = request.FirstName,
-                LastName = request.LastName
-            };
-
-            var result = await _userManager.CreateAsync(
-                user,
-                request.Password);
-
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors.Select(e => e.Description));
-            }
-
-            await _userManager.AddToRoleAsync(user, "Sales Representative");
-
-            return Ok(new
-            {
-                Message = "User registered successfully."
-            });
-        }
+        
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto request)

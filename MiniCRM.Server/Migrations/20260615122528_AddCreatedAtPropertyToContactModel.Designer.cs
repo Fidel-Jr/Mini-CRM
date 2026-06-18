@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MiniCRM.Server.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MiniCRM.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260615122528_AddCreatedAtPropertyToContactModel")]
+    partial class AddCreatedAtPropertyToContactModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -215,10 +218,6 @@ namespace MiniCRM.Server.Migrations
                         .HasColumnType("text")
                         .HasColumnName("first_name");
 
-                    b.Property<DateOnly>("JoinedDate")
-                        .HasColumnType("date")
-                        .HasColumnName("joined_date");
-
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("text")
@@ -261,10 +260,6 @@ namespace MiniCRM.Server.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text")
                         .HasColumnName("security_stamp");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean")
@@ -381,49 +376,6 @@ namespace MiniCRM.Server.Migrations
                         .HasName("pk_customers");
 
                     b.ToTable("customers", (string)null);
-                });
-
-            modelBuilder.Entity("MiniCRM.Server.Entities.Document", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Extension")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("extension");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("file_name");
-
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("file_path");
-
-                    b.Property<long>("FileSize")
-                        .HasColumnType("bigint")
-                        .HasColumnName("file_size");
-
-                    b.Property<string>("FileType")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("file_type");
-
-                    b.Property<DateTime>("UploadedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("uploaded_at");
-
-                    b.HasKey("Id")
-                        .HasName("pk_documents");
-
-                    b.ToTable("documents", (string)null);
                 });
 
             modelBuilder.Entity("MiniCRM.Server.Entities.Note", b =>

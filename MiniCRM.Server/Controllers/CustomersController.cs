@@ -124,6 +124,12 @@ namespace MiniCRM.Server.Controllers
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            var isCustomerExists = await _context.Customers
+                .AnyAsync(c => c.Name.ToLower() == dto.Name.ToLower() && c.Industry.ToLower() == dto.Industry.ToLower() && c.Email.ToLower() == dto.Email.ToLower());
+
+            if (isCustomerExists)
+                return BadRequest(new { Message = "Customer with the same name, industry, and email already exists." });
+
             var customer = new Customer
             {
                 Name = dto.Name,

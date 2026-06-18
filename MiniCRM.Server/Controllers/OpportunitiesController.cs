@@ -21,7 +21,20 @@ namespace MiniCRM.Server.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _context.Opportunities.ToListAsync());
+            var opportunities = await _context.Opportunities
+                .Include(o => o.Customer)
+                .OrderByDescending(o => o.CreatedAt)
+                .Select(o => new
+                {
+                    Id = o.Id,
+                    Title = o.Title,
+                    Value = o.Value,
+                    Stage = o.Stage,
+                    CustomerId = o.CustomerId,
+                    CustomerName = o.Customer != null ? o.Customer.Name : ""
+                })
+                .ToListAsync();
+            return Ok(opportunities);
         }
 
         [HttpPost]
@@ -60,6 +73,7 @@ namespace MiniCRM.Server.Controllers
                 return BadRequest(ModelState);
             }
 
+            opportunity.CustomerId = dto.CustomerId;
             opportunity.Title = dto.Title;
             opportunity.Value = dto.Value;
             opportunity.Stage = dto.Stage;

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MiniCRM.Server.Data;
 using MiniCRM.Server.DTOs;
 using MiniCRM.Server.Entities;
@@ -17,9 +18,34 @@ namespace MiniCRM.Server.Controllers
             _context = context;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var contacts = await _context.Contacts
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(c => new
+                {
+                    Id = c.Id,
+                    FirstName = c.FirstName,
+                    LastName = c.LastName,
+                    Email = c.Email,
+                    Position = c.Position,
+                    CustomerId = c.CustomerId,
+                    CustomerName = c.Customer != null ? c.Customer.Name : ""
+                })
+                .ToListAsync();
+
+            return Ok(contacts);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(ContactDto dto)
         {
+
+            if(!ModelState.IsValid) {
+                return BadRequest(ModelState);
+            }
+
             var contact = new Contact
             {
                 CustomerId = dto.CustomerId,
@@ -44,6 +70,7 @@ namespace MiniCRM.Server.Controllers
             if (contact is null)
                 return NotFound();
 
+            contact.CustomerId = dto.CustomerId;
             contact.FirstName = dto.FirstName;
             contact.LastName = dto.LastName;
             contact.Email = dto.Email;

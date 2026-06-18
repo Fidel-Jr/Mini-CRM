@@ -96,5 +96,7 @@ namespace MiniCRM.Server.Data
         public DbSet<Note> Notes => Set<Note>();
 
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
+        public DbSet<Document> Documents => Set<Document>();
     }
 }
