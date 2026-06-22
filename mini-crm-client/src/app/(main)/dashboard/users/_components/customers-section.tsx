@@ -52,34 +52,55 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { getCustomersColumns } from "./customers-table/columns";
+import { customersColumns } from "./customers-table/columns";
 import { customersSchema } from "./customers-table/schema";
-import { useAuth } from "@/app/contexts/auth-context";
 
 interface Industry {
   name: string;
 }
 
+async function fetchRoles(): Promise<string[]> {
+    const response = await fetch(
+        "https://localhost:7187/api/Users/roles"
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch roles");
+    }
+
+    return response.json();
+}
+
 async function fetchCustomers() {
-  const response = await fetch("https://localhost:7187/api/customers");
+  const response = await fetch("https://localhost:7187/api/Users");
   if (!response.ok) throw new Error(`Failed to fetch customers: ${response.status}`);
   return response.json();
 }
 
 export function CustomersSection() {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["customers"],
+    queryKey: ["users"],
     queryFn: fetchCustomers,
     select: (data) => ({
-      customers: customersSchema.parse(data.customers),
-      industries: data.industries as Industry[],
+      customers: customersSchema.parse(data.users),
     }),
   });
 
-  const {user} = useAuth();
+  const {
+      data: roles = [],
+    } = useQuery({
+        queryKey: ["roles"],
+        queryFn: fetchRoles,
+    });
+
+    const statusOptions = [
+      "all",
+      "Active",
+      "Suspended",
+      "Deactivated",
+    ];
 
   const customers = data?.customers ?? [];
-  const industries = data?.industries ?? [];
 
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -90,14 +111,11 @@ export function CustomersSection() {
     pageSize: 10,
   });
 
-  const industryOptions = ["all", ...industries.map((i) => i.name)];
-  const columns = React.useMemo(
-    () => getCustomersColumns(user?.roles?.includes("Admin") ?? false),
-    [user]
-  );
+  const industryOptions = ["all", ...roles];
+
   const table = useReactTable({
     data: customers,
-    columns,
+    columns: customersColumns,
     state: {
       rowSelection,
       columnFilters,
@@ -105,7 +123,7 @@ export function CustomersSection() {
       globalFilter,
       pagination,
     },
-    getRowId: (row) => row.id.toString(),
+    getRowId: (row) => row.email,
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onColumnFiltersChange: setColumnFilters,
@@ -114,11 +132,21 @@ export function CustomersSection() {
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    globalFilterFn: "includesString",
+    globalFilterFn: (row, _columnId, filterValue) => {
+      const search = String(filterValue).toLowerCase();
+
+      return (
+        row.original.firstName.toLowerCase().includes(search) ||
+        row.original.lastName.toLowerCase().includes(search) ||
+        row.original.email.toLowerCase().includes(search)
+      );
+    },
   });
 
   const searchQuery = table.getState().globalFilter ?? "";
-  const industryFilter = (table.getColumn("industry")?.getFilterValue() as string) ?? "all";
+  const industryFilter = (table.getColumn("role")?.getFilterValue() as string) ?? "all";
+  const statusFilter =
+  (table.getColumn("status")?.getFilterValue() as string) ?? "all";
   const currentPage = table.getState().pagination.pageIndex + 1;
   const pageCount = table.getPageCount();
   const filteredCustomerCount = table.getFilteredRowModel().rows.length;
@@ -147,7 +175,7 @@ export function CustomersSection() {
             <div className="flex items-center gap-2">
               <Input
                 className="h-7 w-44 md:w-52"
-                placeholder="Search customers..."
+                placeholder="Search users..."
                 value={searchQuery}
                 onChange={(event) => {
                   table.setGlobalFilter(event.target.value || undefined);
@@ -158,7 +186,7 @@ export function CustomersSection() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm">
                     <ListFilter data-icon="inline-start" />
-                    Industries
+                    Roles
                     <ChevronDownIcon data-icon="inline-end" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -166,7 +194,7 @@ export function CustomersSection() {
                   <DropdownMenuRadioGroup
                     value={industryFilter}
                     onValueChange={(value) => {
-                      table.getColumn("industry")?.setFilterValue(
+                      table.getColumn("role")?.setFilterValue(
                         value === "all" ? undefined : value
                       );
                       table.setPageIndex(0);
@@ -174,7 +202,33 @@ export function CustomersSection() {
                   >
                     {industryOptions.map((option) => (
                       <DropdownMenuRadioItem key={option} value={option}>
-                        {option === "all" ? "All industries" : option}
+                        {option === "all" ? "All roles" : option}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <ListFilter data-icon="inline-start" />
+                    Status
+                    <ChevronDownIcon data-icon="inline-end" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuRadioGroup
+                    value={statusFilter}
+                    onValueChange={(value) => {
+                      table.getColumn("status")?.setFilterValue(
+                        value === "all" ? undefined : value
+                      );
+                      table.setPageIndex(0);
+                    }}
+                  >
+                    {statusOptions.map((option) => (
+                      <DropdownMenuRadioItem key={option} value={option}>
+                        {option === "all" ? "All statuses" : option}
                       </DropdownMenuRadioItem>
                     ))}
                   </DropdownMenuRadioGroup>

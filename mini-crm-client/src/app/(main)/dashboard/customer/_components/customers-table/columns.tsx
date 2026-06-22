@@ -12,11 +12,13 @@ import { cn } from "@/lib/utils";
 import type { CustomerRow } from "./schema";
 import { EditCustomerSheet } from "../edit-customer-form";
 import React from "react";
+import { useAuth } from "@/app/contexts/auth-context";
 
 const healthStripSlots = Array.from({ length: 18 }, (_, index) => ({
   id: `strip-${index + 1}`,
   threshold: index + 1,
 }));
+
 
 // function getHealthScore(health: CustomerRow["health"]) {
 //   switch (health) {
@@ -32,8 +34,8 @@ const healthStripSlots = Array.from({ length: 18 }, (_, index) => ({
 //       return 0;
 //   }
 // }
-
-export const customersColumns: ColumnDef<CustomerRow>[] = [
+export const getCustomersColumns = (isAdmin: boolean): ColumnDef<CustomerRow>[] => {
+const columns: ColumnDef<CustomerRow>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -89,16 +91,16 @@ export const customersColumns: ColumnDef<CustomerRow>[] = [
     header: "Phone",
     cell: ({ row }) => <div className="text-sm tabular-nums">{row.original.phone || "No Phone Number"}</div>,
   },
-  {
-    id: "actions",
-    header: () => <div className="text-right">Edit</div>,
-    cell: ({ row }) => {
-      const [isOpen, setIsOpen] = React.useState(false);
-      const customer = row.original;
+];
+ if (isAdmin) {
+    columns.push({
+      id: "actions",
+      header: () => <div className="text-right">Edit</div>,
+      cell: ({ row }) => {
+        const [isOpen, setIsOpen] = React.useState(false);
 
-      return (
-        <>
-          <div className="text-right">
+        return (
+          <>
             <Button
               variant="ghost"
               size="icon"
@@ -106,20 +108,20 @@ export const customersColumns: ColumnDef<CustomerRow>[] = [
               onClick={() => setIsOpen(true)}
             >
               <Pencil />
-              <span className="sr-only">Edit customer</span>
             </Button>
-          </div>
 
-          {isOpen && (
-            <EditCustomerSheet
-              customer={row.original}
-              open={isOpen}
-              onOpenChange={setIsOpen}
-            />
-          )}
-        </>
-      );
-    },
-    enableHiding: false,
-  },
-];
+            {isOpen && (
+              <EditCustomerSheet
+                customer={row.original}
+                open={isOpen}
+                onOpenChange={setIsOpen}
+              />
+            )}
+          </>
+        );
+      },
+    });
+  }
+
+  return columns;
+}

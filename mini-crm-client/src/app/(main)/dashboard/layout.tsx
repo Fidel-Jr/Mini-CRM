@@ -21,8 +21,10 @@ import { SearchDialog } from "./_components/sidebar/search-dialog";
 import { ThemeSwitcher } from "./_components/sidebar/theme-switcher";
 import { QuickCreateProvider } from "@/app/quick-create-provider";
 import { SheetForm } from "./sheet-form";
+import { useAuth } from "@/app/contexts/auth-context";
 
 export default async function Layout({ children }: Readonly<{ children: ReactNode }>) {
+  
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
   const [variant, collapsible] = await Promise.all([

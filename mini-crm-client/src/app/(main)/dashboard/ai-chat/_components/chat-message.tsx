@@ -8,7 +8,6 @@ interface Props {
   message: Message;
 }
 
-
 export default function ChatMessage({ message }: Props) {
   const isUser = message.role === 'user';
 
@@ -24,7 +23,7 @@ export default function ChatMessage({ message }: Props) {
         className={`
           max-w-[80%]
           rounded-xl
-          p-4
+          px-4 py-2
           break-words
           ${
             isUser

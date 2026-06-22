@@ -12,6 +12,7 @@ import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@/compo
 import { Input } from "@/components/ui/input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Loader2, Lock, MailIcon } from "lucide-react";
+import { useAuth } from "@/app/contexts/auth-context";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -20,6 +21,11 @@ const formSchema = z.object({
 });
 
 export function LoginForm() {
+  const {
+  refreshUser
+  }
+  =
+  useAuth();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -30,54 +36,42 @@ export function LoginForm() {
     },
   });
   const isSubmitting = form.formState.isSubmitting; // Add this line
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    try {
-      const response = await fetch("https://localhost:7187/api/Auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data), // sends { email, password, remember? }
+  // Updated LoginForm.tsx
+const onSubmit = async (data: z.infer<typeof formSchema>) => {
+  try {
+    // ✅ Call Next.js API route (not direct backend)
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      form.setError('root', { message: errorData.error });
+      toast.error('Login failed', {
+        description: errorData.error || 'Invalid credentials',
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        form.setError("root", {
-          message: errorData.message,
-        });
-        toast.error(
-          <span>Login failed</span>,
-          {
-            description: <span className="text-red-600">{errorData.message || "Invalid credentials"}</span>,
-          }
-        );
-        return;
-      }
-
-      const result = await response.json();
-      
-      // Store token if your API returns one
-      if (result.accessToken) {
-        localStorage.setItem("auth_token", result.accessToken);
-      }
-
-      toast.success(<span>Login successful</span>,
-        {
-          description: <span className="text-green-600">You've been logged in successfully.</span>,
-        });
-      router.push("/dashboard/crm");
-
-      // Optionally redirect
-      // window.location.href = "/dashboard";
-    } catch (error) {
-      toast.error(
-          <span>Network Error</span>,
-          {
-            description: <span className="text-red-600">Could not connect to the server.</span>,
-          }
-        );
+      return;
     }
-  };
+
+    const result = await response.json();
+
+    // ✅ Remove localStorage - cookie is set automatically
+    // localStorage.removeItem("auth_token");  // ❌ Remove this line
+
+    toast.success('Login successful', {
+      description: 'You\'ve been logged in successfully.',
+    });
+    await refreshUser();
+    console.log("Setting cookie:", result.token);
+    router.push('/dashboard/crm');
+  } catch (error) {
+    toast.error('Network Error', {
+      description: 'Could not connect to the server.',
+    });
+  }
+};
 
   return (
     <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">

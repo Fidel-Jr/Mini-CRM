@@ -13,8 +13,9 @@ import {
 } from "@/components/ui/sheet"
 import { Plus } from "lucide-react"
 import { AddContactForm } from "./add-contact-form"
+import { cookies } from 'next/headers';
 
-export function SheetForm() {
+export async function SheetForm() {
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -36,4 +37,12 @@ export function SheetForm() {
       </SheetContent>
     </Sheet>
   )
+}
+
+async function checkIfAdmin(token: string): Promise<boolean> {
+  const user = await fetch('https://backend.com/api/user/profile', {
+    headers: { Authorization: `Bearer ${token}` }
+  }).then(res => res.json());
+  
+  return user.role === 'Admin';
 }

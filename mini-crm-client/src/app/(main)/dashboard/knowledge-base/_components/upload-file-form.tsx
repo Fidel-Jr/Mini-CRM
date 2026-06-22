@@ -23,12 +23,12 @@ async function uploadCustomerFile(data: CustomerForm) {
   formData.append("file", data.file);
 
   const response = await fetch(
-    "https://localhost:7187/api/Documents/upload",
-    {
-      method: "POST",
-      body: formData,
-    }
-  );
+        "/api/documents/upload",
+        {
+            method: "POST",
+            body: formData
+        }
+    );
 
   if (!response.ok) {
     const err = await response.json();

@@ -13,6 +13,7 @@ import { PreferencesStoreProvider } from "@/stores/preferences/preferences-provi
 import "./globals.css";
 import { Providers } from "./providers";
 import { QuickCreateProvider } from "./quick-create-provider";
+import { AuthProvider } from "./contexts/auth-context";
 
 export const metadata: Metadata = {
   title: APP_CONFIG.meta.title,
@@ -47,9 +48,11 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
             navbarStyle={navbar_style}
             font={font}
           >
+            <AuthProvider>
               <Providers>
               {children}
               </Providers>
+              </AuthProvider>
             <Toaster />
           </PreferencesStoreProvider>
         </TooltipProvider>

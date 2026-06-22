@@ -5,10 +5,12 @@ import {
   Calendar,
   ChartBar,
   Contact,
+  FileUser,
   Fingerprint,
   Forklift,
   Gauge,
   GraduationCap,
+  Handshake,
   Kanban,
   LayoutDashboard,
   ListTodo,
@@ -17,6 +19,8 @@ import {
   type LucideIcon,
   Mail,
   MessageSquare,
+  NotebookPen,
+  PersonStanding,
   ReceiptText,
   Settings,
   ShoppingBag,
@@ -104,7 +108,7 @@ export const sidebarItems: NavGroup[] = [
       {
         title: "Customers",
         url: "/dashboard/customer",
-        icon: Mail,
+        icon: Handshake,
       },
       {
         title: "Contacts",
@@ -119,7 +123,7 @@ export const sidebarItems: NavGroup[] = [
       {
         title: "Notes",
         url: "/dashboard/note",
-        icon: Kanban,
+        icon: NotebookPen,
       },
       // {
       //   title: "Invoice",

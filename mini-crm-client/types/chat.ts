@@ -5,6 +5,17 @@ export interface Message {
     role: MessageRole;
     content: string;
     createdAt: string;
-
     sources?: string[];
+}
+
+export interface ChatSession{
+
+    id:string;
+
+    title:string;
+
+    createdAt:string;
+
+    messages:Message[];
+
 }

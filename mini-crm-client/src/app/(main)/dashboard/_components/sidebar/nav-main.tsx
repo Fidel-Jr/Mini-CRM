@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/sidebar";
 import type { NavGroup, NavMainItem } from "@/navigation/sidebar/sidebar-items";
 import { useQuickCreate } from "@/app/quick-create-provider";
+import { useAuth } from "@/app/contexts/auth-context";
 
 interface NavMainProps {
   readonly items: readonly NavGroup[];
@@ -157,6 +158,7 @@ export function NavMain({ items }: NavMainProps) {
     return subItems?.some((sub) => path.startsWith(sub.url)) ?? false;
   };
   const { openSheet } = useQuickCreate();
+  const {user} = useAuth();
   return (
     <>
       <SidebarGroup>
@@ -179,9 +181,10 @@ export function NavMain({ items }: NavMainProps) {
                   side="right"
                   className="w-48"
                 >
+                  {user?.roles.includes('Admin') && (
                   <DropdownMenuItem onClick={() => openSheet("customer")}>
                     Add Customer
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> )}
 
                   <DropdownMenuItem onClick={() => openSheet("contact")}>
                     Add Contact
