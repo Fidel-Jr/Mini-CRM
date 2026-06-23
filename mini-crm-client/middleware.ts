@@ -1,45 +1,51 @@
-import { NextResponse } from 'next/server';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
-
-
-export function middleware(req:NextRequest){
+export function middleware(request: NextRequest) {
 
     const token =
-        req.cookies.get("access_token");
+        request.cookies.get("access_token")?.value;
+
+    const path =
+        request.nextUrl.pathname;
 
 
-    const pathname =
-        req.nextUrl.pathname;
-
-
-    const publicRoutes=[
-        "/login"
-    ];
-
-
-    if(
+    // Not authenticated
+    if (
         !token &&
-        !publicRoutes.includes(pathname)
-    ){
+        path.startsWith("/dashboard")
+    ) {
 
         return NextResponse.redirect(
-            new URL("/login",req.url)
+            new URL(
+                "/login",
+                request.url
+            )
         );
+    }
 
+
+    // Already authenticated
+    if (
+        token &&
+        path === "/login"
+    ) {
+
+        return NextResponse.redirect(
+            new URL(
+                "/dashboard/crm",
+                request.url
+            )
+        );
     }
 
 
     return NextResponse.next();
-
 }
 
 
-
-export const config={
-
-matcher:[
-"/((?!api|_next|favicon.ico).*)"
-]
-
+export const config = {
+    matcher: [
+        "/dashboard/:path*",
+        "/login"
+    ]
 };

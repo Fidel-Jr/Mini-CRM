@@ -46,18 +46,29 @@ const formSchema = z.object({
 type ContactForm = z.infer<typeof formSchema>;
 
 async function createContact(data: ContactForm) {
-  const response = await fetch("https://localhost:7187/api/Contacts", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
+  const response = await fetch(
+        "/api/contacts",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify(data)
+        }
+    );
 
-  if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.message || err.name || "Failed to create customer");
-  }
+    if (!response.ok) {
 
-  return response.json();
+        const err = await response.json().catch(() => ({}));
+
+        throw new Error(
+            err.message ??
+            err.name ??
+            "Failed to create customer"
+        );
+    }
+
+    return response.json();
 }
 
   type Customer = {
@@ -66,7 +77,9 @@ async function createContact(data: ContactForm) {
   };
 
   async function getCustomers(): Promise<Customer[]> {
-    const response = await fetch("https://localhost:7187/api/Customers");
+    const response = await fetch(
+        "/api/customers"
+    );
 
     if (!response.ok) {
       throw new Error("Failed to fetch customers");

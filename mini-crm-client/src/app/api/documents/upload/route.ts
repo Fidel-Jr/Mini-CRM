@@ -1,5 +1,6 @@
 // app/api/documents/upload/route.ts
 
+import { apiFetch } from '@/lib/api';
 import { cookies } from 'next/headers';
 
 export async function POST(req: Request) {
@@ -17,8 +18,8 @@ export async function POST(req: Request) {
 
     const formData = await req.formData();
 
-    const response = await fetch(
-        "https://localhost:7187/api/Documents/upload",
+    const response = await apiFetch(
+        "/api/Documents/upload",
         {
             method: "POST",
             headers: {

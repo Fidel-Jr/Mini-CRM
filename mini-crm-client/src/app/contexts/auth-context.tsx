@@ -50,7 +50,6 @@ export function AuthProvider({
 
                 if(refresh.ok){
 
-
                     return refreshUser();
 
                 }

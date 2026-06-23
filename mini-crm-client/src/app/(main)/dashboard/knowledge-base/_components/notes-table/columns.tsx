@@ -94,10 +94,10 @@ export const notesColumns: ColumnDef<NoteRow>[] = [
       const document = row.original;
 
       const handleDownload = () => {
-        window.open(
-          `https://localhost:7187/api/Documents/${document.id}/download`,
-          "_blank"
-        );
+          window.open(
+              `/api/documents/${document.id}/download`,
+              "_blank"
+          );
       };
 
       return (

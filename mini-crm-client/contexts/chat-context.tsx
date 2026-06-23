@@ -179,14 +179,14 @@ export function ChatProvider({
 
         try {
             const response = await fetch(
-                'https://localhost:7187/api/Documents/chat/stream',
+                '/api/documents/chat/stream',
                 {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json'
                     },
-                    body: JSON.stringify({
-                        message: content
+                    body:JSON.stringify({
+                        message:content
                     })
                 }
             );

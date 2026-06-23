@@ -1,23 +1,19 @@
-// middleware.ts
+import { NextRequest, NextResponse } from "next/server";
 
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-
-export function proxy(
-    request: NextRequest
-){
+export function proxy(request: NextRequest) {
 
     const token =
-        request.cookies.get(
-            "accessToken"
-        );
+        request.cookies.get("access_token")?.value;
 
-    if(
+    const path =
+        request.nextUrl.pathname;
+
+
+    // Not authenticated
+    if (
         !token &&
-        request.nextUrl.pathname.startsWith(
-            "/dashboard"
-        )
-    ){
+        path.startsWith("/dashboard")
+    ) {
 
         return NextResponse.redirect(
             new URL(
@@ -25,18 +21,31 @@ export function proxy(
                 request.url
             )
         );
-
     }
 
-    return NextResponse.next();
 
+    // Already authenticated
+    if (
+        token &&
+        path === "/login"
+    ) {
+
+        return NextResponse.redirect(
+            new URL(
+                "/dashboard/crm",
+                request.url
+            )
+        );
+    }
+
+
+    return NextResponse.next();
 }
 
 
 export const config = {
-
-    matcher:[
-        "/dashboard/:path*"
+    matcher: [
+        "/dashboard/:path*",
+        "/login"
     ]
-
 };

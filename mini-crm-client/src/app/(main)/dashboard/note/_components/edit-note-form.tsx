@@ -70,7 +70,9 @@ type Customer = {
 };
 
 async function getCustomers(): Promise<Customer[]> {
-    const response = await fetch("https://localhost:7187/api/Customers");
+    const response = await fetch(
+        "/api/customers"
+    );
 
     if (!response.ok) {
       throw new Error("Failed to fetch customers");
@@ -82,20 +84,32 @@ async function getCustomers(): Promise<Customer[]> {
   }
 
 async function updateNote(note: Note) {
-  const response = await fetch(`https://localhost:7187/api/notes/${note.id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(note),
-  });
+  const response = await fetch(
+        `/api/notes/${note.id}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(note),
+        }
+    );
 
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.message || err.name || "Failed to update note");
-  }
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
 
-  // Handle 204 No Content or any empty body response
-  const text = await response.text();
-  return text ? JSON.parse(text) : null;
+        throw new Error(
+            err.message ||
+            err.name ||
+            "Failed to update note"
+        );
+    }
+
+    const text = await response.text();
+
+    return text
+        ? JSON.parse(text)
+        : null;
 }
 
 

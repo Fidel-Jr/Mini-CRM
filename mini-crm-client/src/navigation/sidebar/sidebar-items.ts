@@ -45,11 +45,13 @@ export interface NavMainItem {
   comingSoon?: boolean;
   newTab?: boolean;
   isNew?: boolean;
+  roles?: string[];
 }
 
 export interface NavGroup {
   id: number;
   label?: string;
+  roles?: string[];
   items: NavMainItem[];
 }
 
@@ -173,22 +175,19 @@ export const sidebarItems: NavGroup[] = [
   {
     id: 4,
     label: "Admin",
-    items: [
+    items: [  
       {
         title: "Users",
         url: "/dashboard/users",
         icon: Users,
-      },
-      {
-        title: "Login",
-        url: "/login",
-        icon: LogIn,
+        roles: ["Admin"],
       },
       {
         title: "Settings",
-        url: "/dashboard/coming-soon",
+        url: "/dashboard/settings",
         icon: Settings,
+        roles: ["Admin"],
       },
     ],
-  },
+  }
 ];

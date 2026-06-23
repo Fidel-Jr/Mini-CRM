@@ -39,29 +39,42 @@ type UserForm = z.infer<typeof formSchema>;
 
 async function fetchRoles(): Promise<string[]> {
     const response = await fetch(
-        "https://localhost:7187/api/Users/roles"
+        "/api/users/roles"
     );
 
     if (!response.ok) {
-        throw new Error("Failed to fetch roles");
+        throw new Error(
+            `Failed to fetch users: ${response.status}`
+        );
     }
 
     return response.json();
 }
 
 async function createCustomer(data: UserForm) {
-  const response = await fetch("https://localhost:7187/api/Users/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
+  const response = await fetch(
+        "/api/users",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify(data)
+        }
+    );
 
-  if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.message || err.name || "Failed to create user");
-  }
+    if (!response.ok) {
 
-  return response.json();
+        const err = await response.json().catch(() => ({}));
+
+        throw new Error(
+            err.message ??
+            err.name ??
+            "Failed to create user"
+        );
+    }
+
+    return response.json();
 }
 
 export function AddUserForm() {

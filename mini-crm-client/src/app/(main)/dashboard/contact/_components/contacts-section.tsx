@@ -57,9 +57,17 @@ import { contactsSchema } from "./contacts-table/schema";
 
 
 async function fetchContacts() {
-  const response = await fetch("https://localhost:7187/api/Contacts");
-  if (!response.ok) throw new Error(`Failed to fetch contacts: ${response.status}`);
-  return response.json();
+  const response = await fetch(
+        "/api/contacts"
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            `Failed to fetch contacts: ${response.status}`
+        );
+    }
+
+    return response.json();
 }
 
 export function ContactsSection() {

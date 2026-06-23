@@ -57,9 +57,17 @@ import { opportunitiesSchema } from "./opportunities-table/schema";
 
 
 async function fetchOpportunities() {
-  const response = await fetch("https://localhost:7187/api/Opportunities");
-  if (!response.ok) throw new Error(`Failed to fetch opportunities: ${response.status}`);
-  return response.json();
+  const response = await fetch(
+        "/api/opportunities"
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            `Failed to fetch opportunities: ${response.status}`
+        );
+    }
+
+    return response.json();
 }
 
 export function OpportunitiesSection() {

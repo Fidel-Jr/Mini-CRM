@@ -55,15 +55,25 @@ import {
 import { getCustomersColumns } from "./customers-table/columns";
 import { customersSchema } from "./customers-table/schema";
 import { useAuth } from "@/app/contexts/auth-context";
+import { apiFetch } from "@/lib/api";
 
 interface Industry {
   name: string;
 }
 
 async function fetchCustomers() {
-  const response = await fetch("https://localhost:7187/api/customers");
-  if (!response.ok) throw new Error(`Failed to fetch customers: ${response.status}`);
-  return response.json();
+
+    const response = await fetch(
+        "/api/customers"
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            `Failed to fetch customers: ${response.status}`
+        );
+    }
+
+    return response.json();
 }
 
 export function CustomersSection() {

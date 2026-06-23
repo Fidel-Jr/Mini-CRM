@@ -168,40 +168,63 @@ export const customersColumns: ColumnDef<CustomerRow>[] = [
       const {user} = useAuth();
 
       const deactivateMutation = useMutation({
+
         mutationFn: async () => {
-          const response = await fetch(`https://localhost:7187/api/Users/${userRow.id}/deactivate`, {
-            method: "PATCH",
-          });
 
-          if (!response.ok) {
-            const err = await response.json().catch(() => ({}));
-            throw new Error(err.message || err.Message || "Failed to deactivate user");
-          }
+            const response = await fetch(
+                `/api/users/${userRow.id}/deactivate`,
+                {
+                    method: "PATCH"
+                }
+            );
 
-          const text = await response.text();
-          return text ? JSON.parse(text) : null;
+            if (!response.ok) {
+
+                const err = await response.json()
+                    .catch(() => ({}));
+
+                throw new Error(
+                    err.message ??
+                    err.Message ??
+                    "Failed to deactivate user"
+                );
+            }
+
+            const text = await response.text();
+
+            return text
+                ? JSON.parse(text)
+                : null;
         },
+
+
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ["users"] });
-          toast.success("User deactivated", {
-            description: (
-              <span className="text-green-600">
-                {userRow.firstName} {userRow.lastName} has been deactivated.
-              </span>
-            ),
-          });
+
+            queryClient.invalidateQueries({
+                queryKey: ["users"]
+            });
+
+            toast.success(
+                "User deactivated",
+                {
+                    description:
+                        `${userRow.firstName} ${userRow.lastName} has been deactivated.`
+                }
+            );
         },
+
+
         onError: (error) => {
-          const isNetworkError = error instanceof TypeError;
-          toast.error(isNetworkError ? "Network Error" : "Deactivate failed", {
-            description: (
-              <span className="text-red-600">
-                {isNetworkError ? "Could not connect to the server." : error.message}
-              </span>
-            ),
-          });
-        },
-      });
+
+            toast.error(
+                "Deactivate failed",
+                {
+                    description: error.message
+                }
+            );
+        }
+
+    });
 
       return (
         <div className="text-right">

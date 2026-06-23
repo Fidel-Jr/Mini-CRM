@@ -61,20 +61,30 @@ interface Industry {
 
 async function fetchRoles(): Promise<string[]> {
     const response = await fetch(
-        "https://localhost:7187/api/Users/roles"
+        "/api/users/roles"
     );
 
     if (!response.ok) {
-        throw new Error("Failed to fetch roles");
+        throw new Error(
+            `Failed to fetch roles: ${response.status}`
+        );
     }
 
     return response.json();
 }
 
 async function fetchCustomers() {
-  const response = await fetch("https://localhost:7187/api/Users");
-  if (!response.ok) throw new Error(`Failed to fetch customers: ${response.status}`);
-  return response.json();
+  const response = await fetch(
+        "/api/users"
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            `Failed to fetch users: ${response.status}`
+        );
+    }
+
+    return response.json();
 }
 
 export function CustomersSection() {

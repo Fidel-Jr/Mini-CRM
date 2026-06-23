@@ -51,20 +51,32 @@ interface EditCustomerSheetProps {
 }
 
 async function updateCustomer(customer: Customer) {
-  const response = await fetch(`https://localhost:7187/api/customers/${customer.id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(customer),
-  });
+    const response = await fetch(
+        `/api/customers/${customer.id}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(customer),
+        }
+    );
 
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.message || err.name || "Failed to update customer");
-  }
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
 
-  // Handle 204 No Content or any empty body response
-  const text = await response.text();
-  return text ? JSON.parse(text) : null;
+        throw new Error(
+            err.message ||
+            err.name ||
+            "Failed to update customer"
+        );
+    }
+
+    const text = await response.text();
+
+    return text
+        ? JSON.parse(text)
+        : null;
 }
 
 export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomerSheetProps) {

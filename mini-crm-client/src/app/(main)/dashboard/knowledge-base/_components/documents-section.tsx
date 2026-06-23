@@ -57,9 +57,17 @@ import { notesSchema } from "./notes-table/schema";
 
 
 async function fetchNotes() {
-  const response = await fetch("https://localhost:7187/api/Documents");
-  if (!response.ok) throw new Error(`Failed to fetch notes: ${response.status}`);
-  return response.json();
+  const response = await fetch(
+        "/api/documents"
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            `Failed to fetch documents: ${response.status}`
+        );
+    }
+
+    return response.json();
 }
 
 export function DocumentSection() {

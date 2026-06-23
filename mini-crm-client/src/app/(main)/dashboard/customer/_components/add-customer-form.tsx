@@ -26,18 +26,30 @@ const formSchema = z.object({
 type CustomerForm = z.infer<typeof formSchema>;
 
 async function createCustomer(data: CustomerForm) {
-  const response = await fetch("https://localhost:7187/api/Customers", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
 
-  if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.message || err.name || "Failed to create customer");
-  }
+    const response = await fetch(
+        "/api/customers",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify(data)
+        }
+    );
 
-  return response.json();
+    if (!response.ok) {
+
+        const err = await response.json().catch(() => ({}));
+
+        throw new Error(
+            err.message ??
+            err.name ??
+            "Failed to create customer"
+        );
+    }
+
+    return response.json();
 }
 
 export function AddCustomerForm() {
@@ -65,6 +77,7 @@ export function AddCustomerForm() {
         }
       );
       form.reset();
+      
     },
     onError: (error) => {
       const isNetworkError = error instanceof TypeError;

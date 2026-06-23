@@ -35,11 +35,11 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarImage src={user.avatar || undefined} alt={user.email} />
+                <AvatarImage src={user.avatar || undefined} alt={user.firstName + user.lastName} />
                 <AvatarFallback className="rounded-lg">{getInitials(user.email)}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.email}</span>
+                <span className="truncate font-medium">{user.firstName + user.lastName}</span>
                 <span className="truncate text-muted-foreground text-xs">{user.email}</span>
               </div>
               <EllipsisVertical className="ml-auto size-4" />

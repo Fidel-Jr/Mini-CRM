@@ -30,6 +30,25 @@ export function AppSidebar(
 
   const { user, loading } = useAuth();
 
+ const filteredSidebarItems = sidebarItems
+  .map(group => ({
+    ...group,
+    items: group.items.filter(item => {
+      if (!item.roles) {
+        return true;
+      }
+
+      if (!user) {
+        return false;
+      }
+
+      return item.roles.some(role =>
+        user.roles.includes(role)
+      );
+    })
+  }))
+  .filter(group => group.items.length > 0);
+
 
   const {
     sidebarVariant,
@@ -48,7 +67,6 @@ export function AppSidebar(
 
     }))
   );
-
 
   const variant =
     isSynced
@@ -107,7 +125,7 @@ export function AppSidebar(
 
       <SidebarContent>
 
-        <NavMain items={sidebarItems} />
+        <NavMain items={filteredSidebarItems} />
 
       </SidebarContent>
 
