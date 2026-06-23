@@ -10,6 +10,7 @@ using MiniCRM.Server.Services;
 
 namespace MiniCRM.Server.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -69,16 +70,27 @@ namespace MiniCRM.Server.Controllers
                 ProfileImage = "default.jpg"
             };
 
-            var result = await _userManager.CreateAsync(
-                user,
-                request.Password);
+            var DEFAULT_PASSWORD = user.FirstName + user.LastName + "123!"; // Default password
 
-            if (!result.Succeeded)
+            var createResult = await _userManager.CreateAsync(
+                user,
+                DEFAULT_PASSWORD
+            );
+
+            if (!createResult.Succeeded)
             {
-                return BadRequest(result.Errors.Select(e => e.Description));
+                return BadRequest(createResult.Errors);
             }
 
-            await _userManager.AddToRoleAsync(user, request.Role);
+            var roleResult = await _userManager.AddToRoleAsync(
+                user,
+                request.Role
+            );
+
+            if (!roleResult.Succeeded)
+            {
+                return BadRequest(roleResult.Errors);
+            }
 
             return Ok(new
             {
@@ -96,11 +108,14 @@ namespace MiniCRM.Server.Controllers
                 var roles = await _userManager.GetRolesAsync(user);
                 userDtos.Add(new UserDetailsDto
                 {
+                    Id = user.Id,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
                     Email = user.Email!,
                     Role = roles.FirstOrDefault() ?? "No Role",
-                    ProfileImage = user.ProfileImage!
+                    Status = user.Status,
+                    ProfileImage = user.ProfileImage!,
+                    JoinedDate = user.JoinedDate
                 });
             }
             return Ok(new { userDtos });
@@ -193,11 +208,9 @@ namespace MiniCRM.Server.Controllers
             });
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(
-        string id,
-        [FromForm] UpdateUserDto request)
+        string id, [FromBody] UpdateUserDto request)
         {
             var user = await _userManager.FindByIdAsync(id);
 
@@ -233,16 +246,6 @@ namespace MiniCRM.Server.Controllers
                 user.UserName = request.Email;
             }
 
-            // Profile Image
-            if (request.ProfileImage is not null)
-            {
-                await _fileUploadService.DeleteImageAsync(user.ProfileImage);
-
-                var imageName = await _fileUploadService
-                    .SaveImageAsync(request.ProfileImage);
-
-                user.ProfileImage = imageName;
-            }
 
             // Role
             var roleExists = await _roleManager
@@ -276,26 +279,6 @@ namespace MiniCRM.Server.Controllers
             {
                 return BadRequest(
                     result.Errors.Select(e => e.Description));
-            }
-
-            // Password
-            if (!string.IsNullOrWhiteSpace(request.Password))
-            {
-                var token = await _userManager
-                    .GeneratePasswordResetTokenAsync(user);
-
-                var passwordResult =
-                    await _userManager.ResetPasswordAsync(
-                        user,
-                        token,
-                        request.Password);
-
-                if (!passwordResult.Succeeded)
-                {
-                    return BadRequest(
-                        passwordResult.Errors
-                            .Select(e => e.Description));
-                }
             }
 
             return Ok(new

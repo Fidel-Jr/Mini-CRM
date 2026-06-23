@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MiniCRM.Server.Data;
@@ -10,6 +11,7 @@ using MiniCRM.Services.Ingestion;
 
 namespace MiniCRM.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DocumentsController : ControllerBase
@@ -112,20 +114,41 @@ namespace MiniCRM.Server.Controllers
         public async Task Stream(
         [FromBody] ChatRequestDto request,
         CancellationToken cancellationToken)
-        {
-            Response.ContentType = "text/plain";
-
-            await foreach (var chunk in _chatService.StreamResponseAsync(
-                request.Message,
-                cancellationToken))
             {
+                Response.ContentType = "text/plain";
 
-                await Response.WriteAsync(chunk, cancellationToken);
+                try
+                {
+                    await foreach (var chunk in _chatService.StreamResponseAsync(
+                        request.Message,
+                        cancellationToken))
+                    {
+                        await Response.WriteAsync(chunk, cancellationToken);
+                        await Response.Body.FlushAsync(cancellationToken);
+                    }
+                }
+                catch (Exception ex)
+                {
 
-                // Recommended for streaming
-                await Response.Body.FlushAsync(cancellationToken);
+                    // If nothing has been sent yet
+                    if (!Response.HasStarted)
+                    {
+                        Response.StatusCode = 500;
+                        await Response.WriteAsync(
+                            "Sorry, something went wrong.",
+                            cancellationToken);
+                    }
+                    else
+                    {
+                        // Stream already started
+                        await Response.WriteAsync(
+                            "\n\n Sorry, something went wrong.",
+                            cancellationToken);
+
+                        await Response.Body.FlushAsync(cancellationToken);
+                    }
+                }
             }
-        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

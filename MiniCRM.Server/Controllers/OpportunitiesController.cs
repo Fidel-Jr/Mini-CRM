@@ -4,9 +4,11 @@ using MiniCRM.Server.Data;
 using MiniCRM.Server.DTOs;
 using MiniCRM.Server.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MiniCRM.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class OpportunitiesController : ControllerBase

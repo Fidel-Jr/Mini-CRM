@@ -15,8 +15,6 @@ namespace MiniCRM.Server.DTOs
         public string Email { get; set; } = string.Empty;
 
         [Required]
-        public string Password { get; set; } = string.Empty;
-        [Required]
         public string Role { get; set; } = string.Empty;
         [Required]
         public DateOnly JoinedDate { get; set; }

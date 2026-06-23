@@ -71,6 +71,10 @@ namespace MiniCRM.Server.Data
             modelBuilder.Entity<Opportunity>().Property(x => x.Stage)
                 .HasConversion(new EnumToStringConverter<OpportunityStage>());
 
+            modelBuilder.Entity<ApplicationUser>()
+                .Property(x => x.Status)
+                .HasConversion(new EnumToStringConverter<UserStatus>());
+
             modelBuilder.Entity<Opportunity>().HasOne(x => x.Customer)
                 .WithMany(x => x.Opportunities)
                 .HasForeignKey(x => x.CustomerId)

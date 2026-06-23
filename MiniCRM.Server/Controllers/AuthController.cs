@@ -101,7 +101,7 @@ namespace MiniCRM.Server.Controllers
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh(RefreshRequest request)
+        public async Task<IActionResult> Refresh(DTOs.RefreshRequest request)
         {
             var storedToken = await _context.RefreshTokens
                 .Include(rt => rt.User)
