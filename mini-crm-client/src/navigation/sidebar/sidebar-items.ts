@@ -182,12 +182,12 @@ export const sidebarItems: NavGroup[] = [
         icon: Users,
         roles: ["Admin"],
       },
-      {
-        title: "Settings",
-        url: "/dashboard/settings",
-        icon: Settings,
-        roles: ["Admin"],
-      },
+      // {
+      //   title: "Settings",
+      //   url: "/dashboard/settings",
+      //   icon: Settings,
+      //   roles: ["Admin"],
+      // },
     ],
   }
 ];

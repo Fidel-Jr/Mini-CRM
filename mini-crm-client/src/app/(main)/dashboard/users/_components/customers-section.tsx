@@ -92,7 +92,7 @@ export function CustomersSection() {
     queryKey: ["users"],
     queryFn: fetchCustomers,
     select: (data) => ({
-      customers: customersSchema.parse(data.users),
+      customers: customersSchema.parse(data.userDtos),
     }),
   });
 

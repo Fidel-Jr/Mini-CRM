@@ -304,10 +304,12 @@ export function EditOpportunitySheet({ opportunity, open, onOpenChange }: EditOp
                 {...field}
                 id="value"
                 type="number"
-                onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                placeholder="Enter value"
-                aria-invalid={fieldState.invalid}
-                className="rounded-lg border-gray-200 focus:border-primary focus:ring-primary h-11"
+                value={field.value ?? ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  field.onChange(value === "" ? undefined : Number(value));
+                }}
               />
 
               {fieldState.invalid && (

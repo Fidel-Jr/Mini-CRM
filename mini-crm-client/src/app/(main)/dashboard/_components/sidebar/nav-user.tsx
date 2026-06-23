@@ -39,7 +39,7 @@ export function NavUser({
                 <AvatarFallback className="rounded-lg">{getInitials(user.email)}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.firstName + user.lastName}</span>
+                <span className="truncate font-medium">{user.firstName + " " + user.lastName}</span>
                 <span className="truncate text-muted-foreground text-xs">{user.email}</span>
               </div>
               <EllipsisVertical className="ml-auto size-4" />
@@ -69,14 +69,14 @@ export function NavUser({
                 <CircleUser />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              {/* <DropdownMenuItem>
                 <CreditCard />
                 Billing
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <MessageSquareDot />
                 Notifications
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
