@@ -112,7 +112,7 @@ var openAIOptions = new OpenAIClientOptions()
 };
 
 var ghModelsClient = new OpenAIClient(credential, openAIOptions);
-var chatClient = ghModelsClient.GetChatClient("openai/gpt-4o-mini").AsIChatClient();
+var chatClient = ghModelsClient.GetChatClient("google/gemma-4-31b-it:free").AsIChatClient();
 var embeddingGenerator = ghModelsClient.GetEmbeddingClient("openai/text-embedding-3-small").AsIEmbeddingGenerator();
 
 var testEmbedding = await embeddingGenerator.GenerateAsync("policies");

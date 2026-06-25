@@ -33,7 +33,7 @@ public class ChatService(
         var chatOptions = new ChatOptions();
         chatOptions.Tools = [
             AIFunctionFactory.Create(search.LoadDocumentsAsync),
-        AIFunctionFactory.Create(search.SearchAsync)
+            AIFunctionFactory.Create(search.SearchAsync)
         ];
 
         var messages = new List<ChatMessage>

@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MiniCRM.Server.Data;
 using MiniCRM.Server.DTOs;
 using MiniCRM.Server.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
+using MiniCRM.Server.Enums;
 
 namespace MiniCRM.Server.Controllers
 {
@@ -18,6 +19,12 @@ namespace MiniCRM.Server.Controllers
         public OpportunitiesController(AppDbContext context)
         {
             _context = context;
+        }
+
+        private static bool IsClosed(OpportunityStage stage)
+        {
+            return stage is OpportunityStage.Won
+                or OpportunityStage.Lost;
         }
 
         [HttpGet]
@@ -79,6 +86,7 @@ namespace MiniCRM.Server.Controllers
             opportunity.Title = dto.Title;
             opportunity.Value = dto.Value;
             opportunity.Stage = dto.Stage;
+            opportunity.ClosedAt = IsClosed(dto.Stage) ? DateTime.UtcNow : (DateTime?)null;
 
             await _context.SaveChangesAsync();
 

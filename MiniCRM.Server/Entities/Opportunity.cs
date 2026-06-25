@@ -18,6 +18,8 @@ namespace MiniCRM.Server.Entities
         public DateTime CreatedAt { get; set; }
             = DateTime.UtcNow;
 
+        public DateTime? ClosedAt { get; set; }
+
         public Customer Customer { get; set; }
             = null!;
     }
