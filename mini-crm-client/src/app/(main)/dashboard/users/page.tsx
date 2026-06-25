@@ -1,5 +1,5 @@
 import { SheetForm } from './_components/add-user'
-import { CustomersSection } from './_components/customers-section'
+import { UsersSection } from './_components/users-section'
 import { getUser } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
@@ -42,9 +42,8 @@ export default async function Page() {
             </div>
             
             <SheetForm />
-            {/* <Button className='py-5 px-4'>Add Customer</Button> */}
         </div>
-        <CustomersSection/>
+        <UsersSection />
     </>
     
   )

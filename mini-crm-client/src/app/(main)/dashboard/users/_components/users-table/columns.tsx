@@ -9,10 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
-import type { CustomerRow } from "./schema";
+import type { UserRow } from "./schema";
 import React from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { EditCustomerSheet } from "../edit-customer-form";
+import { EditUserSheet } from "../edit-user-form";
 import { ViewProfile } from "../../view-profile";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -38,14 +38,14 @@ const healthStripSlots = Array.from({ length: 18 }, (_, index) => ({
 //   }
 // }
 
-export const customersColumns: ColumnDef<CustomerRow>[] = [
+export const usersColumns: ColumnDef<UserRow>[] = [
   {
     id: "select",
     header: ({ table }) => (
       <Checkbox
         checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all customers"
+        aria-label="Select all users"
       />
     ),
     cell: ({ row }) => (
@@ -263,8 +263,8 @@ export const customersColumns: ColumnDef<CustomerRow>[] = [
           </DropdownMenu>
 
           {isOpen && (
-            <EditCustomerSheet
-              customer={userRow}
+            <EditUserSheet
+              user={userRow}
               open={isOpen}
               onOpenChange={setIsOpen}
             />
@@ -272,7 +272,7 @@ export const customersColumns: ColumnDef<CustomerRow>[] = [
 
           {isViewOpen && (
           <ViewProfile
-            customer={userRow}
+            userProfile={userRow}
             open={isViewOpen}
             onOpenChange={setIsViewOpen}
             onEdit={() => setIsOpen(true)}

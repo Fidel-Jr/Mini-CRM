@@ -14,7 +14,7 @@ import { Mail, Shield, Calendar, X, User2, CheckCircle2, PauseCircle, XCircle } 
 import React from "react";
 import { useAuth } from "@/app/contexts/auth-context";
 
-interface Customer {
+interface User {
   id: string;
   firstName: string;
   lastName: string;
@@ -26,34 +26,34 @@ interface Customer {
   profileImageUrl?: string;
 }
 
-interface ViewCustomerProfileProps {
-  customer: Customer;
+interface ViewUserProfileProps {
+  userProfile: User;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onEdit: () => void;
 }
 
-const statusStyles: Record<Customer["status"], string> = {
+const statusStyles: Record<User["status"], string> = {
   Active: "bg-green-100 text-green-800 border-green-200",
   Deactivated: "bg-red-100 text-red-800 border-red-200",
   Suspended: "bg-orange-100 text-orange-800 border-orange-200",
 };
 
-const statusIcons: Record<Customer["status"], React.ElementType> = {
+const statusIcons: Record<User["status"], React.ElementType> = {
   Active: CheckCircle2,
   Suspended: PauseCircle,
   Deactivated: XCircle,
 };
 
-const statusIconColors: Record<Customer["status"], string> = {
+const statusIconColors: Record<User["status"], string> = {
   Active: "bg-green-100 text-green-600",
   Suspended: "bg-orange-100 text-orange-600",
   Deactivated: "bg-red-100 text-red-600",
 };
 
-export function ViewProfile({ customer, open, onOpenChange, onEdit  }: ViewCustomerProfileProps) {
-  const fullName = `${customer.firstName} ${customer.lastName}`;
-  const initials = `${customer.firstName?.[0] ?? ""}${customer.lastName?.[0] ?? ""}`;
+export function ViewProfile({ userProfile, open, onOpenChange, onEdit  }: ViewUserProfileProps) {
+  const fullName = `${userProfile.firstName} ${userProfile.lastName}`;
+  const initials = `${userProfile.firstName?.[0] ?? ""}${userProfile.lastName?.[0] ?? ""}`;
   const {user} = useAuth();
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -74,9 +74,9 @@ export function ViewProfile({ customer, open, onOpenChange, onEdit  }: ViewCusto
         {/* Header band */}
          <div className="flex-1 min-h-0 overflow-y-auto">
             <div className="bg-gradient-to-br from-orange-50 to-orange-100/60 px-6 pt-10 pb-8 flex flex-col items-center text-center">
-            {customer.profileImageUrl ? (
+            {userProfile.profileImageUrl ? (
                 <img
-                src={customer.profileImageUrl}
+                src={userProfile.profileImageUrl}
                 alt={fullName}
                 className="h-24 w-24 rounded-full object-cover border-4 border-white shadow-md"
                 />
@@ -87,10 +87,10 @@ export function ViewProfile({ customer, open, onOpenChange, onEdit  }: ViewCusto
             )}
 
             <h2 className="mt-4 text-xl font-bold text-gray-900">{fullName}</h2>
-            <p className="text-sm text-gray-500">{customer.email}</p>
+            <p className="text-sm text-gray-500">{userProfile.email}</p>
 
-            <Badge variant="outline" className={`mt-3 rounded-full px-3 ${statusStyles[customer.status]}`}>
-                {customer.status}
+            <Badge variant="outline" className={`mt-3 rounded-full px-3 ${statusStyles[userProfile.status]}`}>
+                {userProfile.status}
             </Badge>
             </div>
 
@@ -104,7 +104,7 @@ export function ViewProfile({ customer, open, onOpenChange, onEdit  }: ViewCusto
                 </div>
                 <div className="flex flex-col">
                     <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Fullname</span>
-                    <span className="text-sm font-medium text-gray-800">{customer.firstName + " " + customer.lastName}</span>
+                    <span className="text-sm font-medium text-gray-800">{userProfile.firstName + " " + userProfile.lastName}</span>
                 </div>
             </div>
             <div className="flex items-center gap-3">
@@ -113,7 +113,7 @@ export function ViewProfile({ customer, open, onOpenChange, onEdit  }: ViewCusto
                 </div>
                 <div className="flex flex-col">
                 <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Email</span>
-                <span className="text-sm font-medium text-gray-800">{customer.email}</span>
+                <span className="text-sm font-medium text-gray-800">{userProfile.email}</span>
                 </div>
             </div>
 
@@ -123,17 +123,17 @@ export function ViewProfile({ customer, open, onOpenChange, onEdit  }: ViewCusto
                 </div>
                 <div className="flex flex-col">
                 <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Role</span>
-                <span className="text-sm font-medium text-gray-800">{customer.role}</span>
+                <span className="text-sm font-medium text-gray-800">{userProfile.role}</span>
                 </div>
             </div>
 
             <div className="flex items-center gap-3">
-                <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${statusIconColors[customer.status]}`}>
-                    {React.createElement(statusIcons[customer.status], { className: "size-4" })}
+                <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${statusIconColors[userProfile.status]}`}>
+                    {React.createElement(statusIcons[userProfile.status], { className: "size-4" })}
                 </div>
                 <div className="flex flex-col">
                     <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Status</span>
-                    <span className="text-sm font-medium text-gray-800">{customer.status}</span>
+                    <span className="text-sm font-medium text-gray-800">{userProfile.status}</span>
                 </div>
             </div>
 
@@ -143,7 +143,7 @@ export function ViewProfile({ customer, open, onOpenChange, onEdit  }: ViewCusto
                 </div>
                 <div className="flex flex-col">
                 <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Joined</span>
-                <span className="text-sm font-medium text-gray-800">{customer.joinedDate || "No date"}</span>
+                <span className="text-sm font-medium text-gray-800">{userProfile.joinedDate || "No date"}</span>
                 </div>
             </div>
          </div>

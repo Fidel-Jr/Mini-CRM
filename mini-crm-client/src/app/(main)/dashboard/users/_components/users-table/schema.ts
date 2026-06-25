@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const customerSchema = z.object({
+export const userSchema = z.object({
   id: z.string(),
   firstName: z.string(),
   lastName: z.string(),
@@ -10,6 +10,6 @@ export const customerSchema = z.object({
   joinedDate: z.string(),
 });
 
-export const customersSchema = z.array(customerSchema);
+export const usersSchema = z.array(userSchema);
 
-export type CustomerRow = z.infer<typeof customerSchema>;
+export type UserRow = z.infer<typeof userSchema>;

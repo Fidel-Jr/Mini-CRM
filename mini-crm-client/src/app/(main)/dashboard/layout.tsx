@@ -84,7 +84,7 @@ export default async function Layout({ children }: Readonly<{ children: ReactNod
                     <SimpleIcon icon={siGithub} className="fill-primary-foreground" />
                   </Link>
                 </Button> */}
-                <AccountSwitcher users={users} />
+                {/* <AccountSwitcher users={users} /> */}
               </div>
             </div>
           </header>

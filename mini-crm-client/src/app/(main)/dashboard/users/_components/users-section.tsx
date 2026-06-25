@@ -52,8 +52,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { customersColumns } from "./customers-table/columns";
-import { customersSchema } from "./customers-table/schema";
+import { usersColumns } from "./users-table/columns";
+import { usersSchema } from "./users-table/schema";
 
 interface Industry {
   name: string;
@@ -73,7 +73,7 @@ async function fetchRoles(): Promise<string[]> {
     return response.json();
 }
 
-async function fetchCustomers() {
+async function fetchUsers() {
   const response = await fetch(
         "/api/users"
     );
@@ -87,12 +87,12 @@ async function fetchCustomers() {
     return response.json();
 }
 
-export function CustomersSection() {
+export function UsersSection() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["users"],
-    queryFn: fetchCustomers,
+    queryFn: fetchUsers,
     select: (data) => ({
-      customers: customersSchema.parse(data.userDtos),
+      users: usersSchema.parse(data.userDtos),
     }),
   });
 
@@ -110,7 +110,7 @@ export function CustomersSection() {
       "Deactivated",
     ];
 
-  const customers = data?.customers ?? [];
+  const users = data?.users ?? [];
 
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -121,11 +121,11 @@ export function CustomersSection() {
     pageSize: 10,
   });
 
-  const industryOptions = ["all", ...roles];
+  const roleOptions = ["all", ...roles];
 
   const table = useReactTable({
-    data: customers,
-    columns: customersColumns,
+    data: users,
+    columns: usersColumns,
     state: {
       rowSelection,
       columnFilters,
@@ -154,13 +154,13 @@ export function CustomersSection() {
   });
 
   const searchQuery = table.getState().globalFilter ?? "";
-  const industryFilter = (table.getColumn("role")?.getFilterValue() as string) ?? "all";
+  const roleFilter = (table.getColumn("role")?.getFilterValue() as string) ?? "all";
   const statusFilter =
   (table.getColumn("status")?.getFilterValue() as string) ?? "all";
   const currentPage = table.getState().pagination.pageIndex + 1;
   const pageCount = table.getPageCount();
-  const filteredCustomerCount = table.getFilteredRowModel().rows.length;
-  const visibleCustomerCount = table.getRowModel().rows.length;
+  const filteredUserCount = table.getFilteredRowModel().rows.length;
+  const visibleUserCount = table.getRowModel().rows.length;
 
   const pageNumbers = React.useMemo(() => {
     if (pageCount <= 3) return Array.from({ length: pageCount }, (_, i) => i + 1);
@@ -177,9 +177,9 @@ export function CustomersSection() {
     <section>
       <Card>
         <CardHeader>
-          <CardTitle className="leading-none">Recent Customers</CardTitle>
+          <CardTitle className="leading-none">All Users</CardTitle>
           <CardDescription>
-            Track customers across manufacturing, logistics, and other industries.
+            Track user details.
           </CardDescription>
           <CardAction>
             <div className="flex items-center gap-2">
@@ -202,7 +202,7 @@ export function CustomersSection() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40">
                   <DropdownMenuRadioGroup
-                    value={industryFilter}
+                    value={roleFilter}
                     onValueChange={(value) => {
                       table.getColumn("role")?.setFilterValue(
                         value === "all" ? undefined : value
@@ -210,7 +210,7 @@ export function CustomersSection() {
                       table.setPageIndex(0);
                     }}
                   >
-                    {industryOptions.map((option) => (
+                    {roleOptions.map((option) => (
                       <DropdownMenuRadioItem key={option} value={option}>
                         {option === "all" ? "All roles" : option}
                       </DropdownMenuRadioItem>
@@ -304,7 +304,7 @@ export function CustomersSection() {
               </div>
               <div className="flex items-center justify-between gap-4 px-4 pb-1">
                 <p className="text-muted-foreground text-sm">
-                  Viewing {visibleCustomerCount} out of {filteredCustomerCount.toLocaleString()} customers
+                  Viewing {visibleUserCount} out of {filteredUserCount.toLocaleString()} users
                 </p>
                 <Pagination className="mx-0 w-auto justify-end">
                   <PaginationContent className="gap-1.5">

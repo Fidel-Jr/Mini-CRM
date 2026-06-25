@@ -49,9 +49,9 @@ const formSchema = z.object({
   }),
 });
 
-type CustomerForm = z.infer<typeof formSchema>;
+type UserForm = z.infer<typeof formSchema>;
 
-interface Customer {
+interface User {
   id: string,
   firstName: string;
   lastName: string;
@@ -62,8 +62,8 @@ interface Customer {
   profileImage?: File;
 }
 
-interface EditCustomerSheetProps {
-  customer: Customer;
+interface EditUserSheetProps {
+  user: User;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -82,15 +82,15 @@ async function fetchRoles(): Promise<string[]> {
     return response.json();
 }
 
-async function updateCustomer(customer: Customer) {
+async function updateUser(user: User) {
   const response = await fetch(
-        `/api/users/${customer.id}`,
+        `/api/users/${user.id}`,
         {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(customer),
+            body: JSON.stringify(user),
         }
     );
 
@@ -111,7 +111,7 @@ async function updateCustomer(customer: Customer) {
         : null;
 }
 
-export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomerSheetProps) {
+export function EditUserSheet({ user, open, onOpenChange }: EditUserSheetProps) {
   const queryClient = useQueryClient();
 
   const {
@@ -121,7 +121,7 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
       queryFn: fetchRoles,
   });
 
-  const form = useForm<CustomerForm>({
+  const form = useForm<UserForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       firstName: "",
@@ -133,27 +133,27 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
     },
   });
 
-  // Sync form when customer prop changes (e.g. opening a different row)
+  // Sync form when user prop changes (e.g. opening a different row)
   React.useEffect(() => {
-  if (!customer) return;
+  if (!user) return;
 
     form.reset({
-      firstName: customer.firstName ?? "",
-      lastName: customer.lastName ?? "",
-      email: customer.email ?? "",
-      role: customer.role ?? "",
-      status: customer.status ?? "Active",
-      joinedDate: customer.joinedDate ?? "",
+      firstName: user.firstName ?? "",
+      lastName: user.lastName ?? "",
+      email: user.email ?? "",
+      role: user.role ?? "",
+      status: user.status ?? "Active",
+      joinedDate: user.joinedDate ?? "",
     });
-  }, [customer, form]);
+  }, [user, form]);
 
   const mutation = useMutation({
-    mutationFn: (data: CustomerForm) => updateCustomer({ ...data,
-  id: customer.id,
+    mutationFn: (data: UserForm) => updateUser({ ...data,
+  id: user.id,
   joinedDate: data.joinedDate ?? "", }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("Customer updated successfully", {
+      toast.success("User updated successfully", {
         description: (
           <span className="text-green-600">
             "{variables.email}" has been updated.
@@ -173,16 +173,16 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
     },
   });
 
-  const onSubmit = (data: CustomerForm) => mutation.mutate(data);
+  const onSubmit = (data: UserForm) => mutation.mutate(data);
   const isSubmitting = mutation.isPending;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="!w-full sm:!w-[500px] !max-w-none sm:!max-w-none rounded-t-2xl sm:rounded-2xl shadow-xl">
         <SheetHeader className="pb-6 border-b border-gray-100">
-          <SheetTitle className="text-2xl font-bold">Edit Customer</SheetTitle>
+          <SheetTitle className="text-2xl font-bold">Edit User</SheetTitle>
           <SheetDescription className="text-gray-600 text-base">
-            Update customer information below. Click save when you&apos;re done.
+            Update user information below. Click save when you&apos;re done.
           </SheetDescription>
         </SheetHeader>
 

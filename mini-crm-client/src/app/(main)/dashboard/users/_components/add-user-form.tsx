@@ -11,7 +11,7 @@ import { Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { customersSchema } from "./customers-table/schema";
+import { usersSchema } from "./users-table/schema";
 
 
 export const formSchema = z.object({
@@ -51,7 +51,7 @@ async function fetchRoles(): Promise<string[]> {
     return response.json();
 }
 
-async function createCustomer(data: UserForm) {
+async function createUser(data: UserForm) {
   const response = await fetch(
         "/api/users",
         {
@@ -100,13 +100,13 @@ export function AddUserForm() {
 });
 
   const mutation = useMutation({
-    mutationFn: createCustomer,
+    mutationFn: createUser,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       toast.success(
-        <span>Customer created successfully</span>,
+        <span>User created successfully</span>,
         {
-          description: <span className="text-green-600">"{variables.email}" has been added to your customers.</span>,
+          description: <span className="text-green-600">"{variables.email}" has been added to your users.</span>,
         }
       );
       form.reset();
