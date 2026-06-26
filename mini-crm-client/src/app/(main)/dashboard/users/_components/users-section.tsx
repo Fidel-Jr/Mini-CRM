@@ -250,7 +250,7 @@ export function UsersSection() {
         <CardContent className="flex flex-col gap-4 px-0">
           {isLoading && (
             <div className="h-24 text-center text-muted-foreground flex items-center justify-center">
-              Loading customers...
+              Loading users...
             </div>
           )}
           {error && (

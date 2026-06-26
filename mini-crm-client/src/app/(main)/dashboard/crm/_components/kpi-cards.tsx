@@ -21,7 +21,6 @@ type Metric = {
     previous: number;
 };
 
-
 export interface DashboardMetrics {
     pipelineValue: Metric;
     openOpportunities: Metric;
@@ -29,11 +28,9 @@ export interface DashboardMetrics {
     winRate: Metric;
 }
 
-
 interface KpiCardsProps {
     metrics?: DashboardMetrics;
 }
-
 
 function getPercentage(
     current: number,
@@ -45,7 +42,6 @@ function getPercentage(
         ((current - previous) / previous) * 100
     );
 }
-
 
 function getBadgeClasses(positive: boolean) {
     return positive

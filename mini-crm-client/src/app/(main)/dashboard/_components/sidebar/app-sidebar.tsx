@@ -28,7 +28,7 @@ export function AppSidebar(
   props: React.ComponentProps<typeof Sidebar>
 ) {
 
-  const { user, loading } = useAuth();
+ const { user, loading } = useAuth();
 
  const filteredSidebarItems = sidebarItems
   .map(group => ({

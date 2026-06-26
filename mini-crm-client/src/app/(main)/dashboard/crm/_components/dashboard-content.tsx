@@ -23,7 +23,6 @@ export default function Page() {
             const response = await fetch(
 
                 `/api/analytics/dashboard?range=${range}`
-
             );
 
             if (!response.ok)
@@ -34,34 +33,23 @@ export default function Page() {
 
     });
 
-
     if (isLoading) {
         return <div>Loading...</div>;
     }
 
-
     return (
 
         <div className="flex flex-col gap-4 md:gap-6">
-
             <KpiCards metrics={data} />
-
             <PipelineActivity
-
                 trend={data.leadPipelineTrend}
-
                 summary={data.wonSummary}
-
                 range={range}
-
                 onRangeChange={setRange}
-
             />
-
+            
             {/* <TaskReminders /> */}
-
             <OpportunitiesSection />
-
         </div>
 
     );

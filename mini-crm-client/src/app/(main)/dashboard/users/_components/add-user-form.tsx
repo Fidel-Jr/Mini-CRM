@@ -114,7 +114,7 @@ export function AddUserForm() {
     onError: (error) => {
       const isNetworkError = error instanceof TypeError;
 
-      toast.error(isNetworkError ? "Network Error" : "Create customer failed", {
+      toast.error(isNetworkError ? "Network Error" : "Create user failed", {
         description: (
           <span className="text-red-600">
             {isNetworkError ? "Could not connect to the server." : error.message}
