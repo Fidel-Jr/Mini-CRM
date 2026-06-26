@@ -99,7 +99,7 @@ export function AppSidebar(
             <SidebarMenuButton asChild>
 
               <Link
-                href="/dashboard/default"
+                href="/dashboard"
                 prefetch={false}
               >
 

@@ -35,7 +35,7 @@ export function AuthProvider({
             const res = await fetch("/api/auth/me");
 
             if (!res.ok) {
-                await logout();
+                // await logout();
                 return;
             }
 
@@ -49,11 +49,8 @@ export function AuthProvider({
 
     // ✅ logout (CORRECT PLACE)
     const logout = async () => {
-        await fetch("/api/auth/logout", {
-            method: "POST",
-        });
-
         setUser(null);
+        window.location.href = "/logout";
     };
 
     useEffect(() => {

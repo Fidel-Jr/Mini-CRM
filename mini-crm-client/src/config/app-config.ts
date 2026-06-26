@@ -7,8 +7,8 @@ export const APP_CONFIG = {
   version: packageJson.version,
   copyright: `© ${currentYear}, Studio Admin.`,
   meta: {
-    title: "Studio Admin - Modern Next.js Dashboard Starter Template",
+    title: "Mini CRM - AI knowledge assistant",
     description:
-      "Studio Admin is a modern, open-source dashboard starter template built with Next.js 16, Tailwind CSS v4, and shadcn/ui. Perfect for SaaS apps, admin panels, and internal tools—fully customizable and production-ready.",
+      "A small CRM for managing customers and sales opportunities, enhanced with an AI knowledge assistant powered by company documents.",
   },
 };

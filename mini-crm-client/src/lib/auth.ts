@@ -1,6 +1,7 @@
 // lib/auth.ts
 
 import { cookies } from 'next/headers';
+import { apiFetch } from './api';
 
 export async function getUser() {
     const token = (await cookies())
@@ -15,14 +16,8 @@ export async function getUser() {
         return null;
     }
 
-    const res = await fetch(
-        "https://localhost:7187/api/Auth/me",
-        {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-            cache: 'no-store',
-        }
+    const res = await apiFetch(
+        "/api/Auth/me"
     );
 
     if (!res.ok) {

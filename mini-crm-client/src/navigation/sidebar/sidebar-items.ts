@@ -67,7 +67,7 @@ export const sidebarItems: NavGroup[] = [
       // },
       {
         title: "Dashboard",
-        url: "/dashboard/crm",
+        url: "/dashboard",
         icon: ChartBar,
       },
       // {

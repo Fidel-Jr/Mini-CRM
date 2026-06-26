@@ -1,5 +1,5 @@
 import DashboardContent from "./_components/dashboard-content";
 
-export default function Page() {
+export default function Dashboard() {
     return <DashboardContent />;
 }
