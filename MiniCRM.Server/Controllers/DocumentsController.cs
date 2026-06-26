@@ -33,6 +33,7 @@ namespace MiniCRM.Server.Controllers
         public async Task<IActionResult> GetAll()
         {
             var documents = await _context.Documents
+                .OrderByDescending(d => d.UploadedAt)
                 .Select(d => new
                 {
                     Id = d.Id,
@@ -114,42 +115,43 @@ namespace MiniCRM.Server.Controllers
         public async Task Stream(
         [FromBody] ChatRequestDto request,
         CancellationToken cancellationToken)
+        {
+            Response.ContentType = "text/plain";
+
+            try
             {
-                Response.ContentType = "text/plain";
-
-                try
+                await foreach (var chunk in _chatService.StreamResponseAsync(
+                    request.Message,
+                    cancellationToken))
                 {
-                    await foreach (var chunk in _chatService.StreamResponseAsync(
-                        request.Message,
-                        cancellationToken))
-                    {
-                        await Response.WriteAsync(chunk, cancellationToken);
-                        await Response.Body.FlushAsync(cancellationToken);
-                    }
-                }
-                catch (Exception ex)
-                {
-
-                    // If nothing has been sent yet
-                    if (!Response.HasStarted)
-                    {
-                        Response.StatusCode = 500;
-                        await Response.WriteAsync(
-                            "Sorry, something went wrong.",
-                            cancellationToken);
-                    }
-                    else
-                    {
-                        // Stream already started
-                        await Response.WriteAsync(
-                            "\n\n Sorry, something went wrong.",
-                            cancellationToken);
-
-                        await Response.Body.FlushAsync(cancellationToken);
-                    }
+                    await Response.WriteAsync(chunk, cancellationToken);
+                    await Response.Body.FlushAsync(cancellationToken);
                 }
             }
+            catch (Exception ex)
+            {
 
+                // If nothing has been sent yet
+                if (!Response.HasStarted)
+                {
+                    Response.StatusCode = 500;
+                    await Response.WriteAsync(
+                        "Sorry, something went wrong.",
+                        cancellationToken);
+                }
+                else
+                {
+                    // Stream already started
+                    await Response.WriteAsync(
+                        "\n\n Sorry, something went wrong.",
+                        cancellationToken);
+
+                    await Response.Body.FlushAsync(cancellationToken);
+                }
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

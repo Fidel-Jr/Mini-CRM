@@ -136,8 +136,13 @@ builder.Services.AddScoped<FileUploadService>();
 var app = builder.Build();
 
 using var scope = app.Services.CreateScope();
+var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
+await db.Database.MigrateAsync();
 await RoleSeeder.SeedAsync(
+    scope.ServiceProvider);
+
+await UserSeeder.SeedAsync(
     scope.ServiceProvider);
 
 // Configure the HTTP request pipeline.
@@ -153,6 +158,7 @@ app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseStaticFiles(); // Must exist
 
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 

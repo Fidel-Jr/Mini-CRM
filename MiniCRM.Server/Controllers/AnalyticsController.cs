@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MiniCRM.Server.Data;
@@ -6,6 +7,7 @@ using MiniCRM.Server.Enums;
 
 namespace MiniCRM.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AnalyticsController : ControllerBase
@@ -32,7 +34,7 @@ namespace MiniCRM.Server.Controllers
                     break;
 
                 case "quarter":
-                    trendStart = now.AddMonths(-4);
+                    trendStart = now.AddMonths(-3);
                     break;
 
                 default:
@@ -124,8 +126,6 @@ namespace MiniCRM.Server.Controllers
                     (wonDeals + lostDeals) * 100,
                     1)
                 : 0;
-
-
 
             var previousWonDeals = previousClosedDeals.Count(o =>
                 o.Stage == OpportunityStage.Won);

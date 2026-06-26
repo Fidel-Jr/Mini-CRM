@@ -21,12 +21,14 @@ namespace MiniCRM.Server.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IJwtService _jwtService;
         private readonly AppDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public AuthController(UserManager<ApplicationUser> userManager, IJwtService jwtService, AppDbContext context)
+        public AuthController(UserManager<ApplicationUser> userManager, IJwtService jwtService, AppDbContext context, IConfiguration configuration)
         {
             _userManager = userManager;
             _jwtService = jwtService;
             _context = context;
+            _configuration = configuration;
         }
         
 
@@ -59,18 +61,24 @@ namespace MiniCRM.Server.Controllers
                 });
             }
 
+            var accessExpires =
+                DateTime.UtcNow.AddMinutes(
+                    int.Parse(_configuration["Jwt:ExpiresInMinutes"]!));
+
             var token = await _jwtService.GenerateAccessTokenAsync(user);
             var refreshToken = await _jwtService.GenerateRefreshTokenAsync(user.Id);
 
             return Ok(new LoginResponse
             {
                 AccessToken = token,
-                RefreshToken = refreshToken
+                RefreshToken = refreshToken,
+                AccessTokenExpiresAt = accessExpires,
+                RefreshTokenExpiresAt = DateTime.UtcNow.AddDays(7)
             });
         }
 
-        [HttpGet("me")]
         [Authorize]
+        [HttpGet("me")]
         public async Task<IActionResult> Me()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -123,10 +131,16 @@ namespace MiniCRM.Server.Controllers
             var newAccessToken = await _jwtService.GenerateAccessTokenAsync(user);
             var newRefreshToken = await _jwtService.GenerateRefreshTokenAsync(user.Id);
 
+            var accessExpires =
+                DateTime.UtcNow.AddMinutes(
+                    int.Parse(_configuration["Jwt:ExpiresInMinutes"]!));
+
             return Ok(new
             {
                 AccessToken = newAccessToken,
                 RefreshToken = newRefreshToken,
+                AccessTokenExpiresAt = accessExpires,
+                RefreshTokenExpiresAt = DateTime.UtcNow.AddDays(7)
             });
         }
     }

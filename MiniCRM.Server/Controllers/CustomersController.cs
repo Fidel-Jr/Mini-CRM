@@ -120,6 +120,7 @@ namespace MiniCRM.Server.Controllers
             return Ok(customer);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(CustomerDto dto)
         {
@@ -150,6 +151,7 @@ namespace MiniCRM.Server.Controllers
                 customer);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateCustomerDto dto)
         {
@@ -169,6 +171,7 @@ namespace MiniCRM.Server.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
