@@ -151,7 +151,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
+app.UseStaticFiles(); // Must exist
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

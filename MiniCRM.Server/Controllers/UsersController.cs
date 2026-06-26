@@ -10,7 +10,7 @@ using MiniCRM.Server.Services;
 
 namespace MiniCRM.Server.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -30,6 +30,7 @@ namespace MiniCRM.Server.Controllers
             _fileUploadService = fileUploadService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto request)
         {
@@ -67,7 +68,6 @@ namespace MiniCRM.Server.Controllers
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 JoinedDate = request.JoinedDate,
-                ProfileImage = "default.jpg"
             };
 
             var DEFAULT_PASSWORD = user.FirstName + user.LastName + "123!   "; // Default password
@@ -98,6 +98,7 @@ namespace MiniCRM.Server.Controllers
             });
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
@@ -121,6 +122,7 @@ namespace MiniCRM.Server.Controllers
             return Ok(new { userDtos });
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("roles")]
         public IActionResult GetRoles()
         {
@@ -131,7 +133,6 @@ namespace MiniCRM.Server.Controllers
             return Ok(roles);
         }
 
-        [Authorize]
         [HttpPut("profile")]
         public async Task<IActionResult> UpdateProfile([FromForm] UpdateProfileDto request)
         {
@@ -183,22 +184,31 @@ namespace MiniCRM.Server.Controllers
             }
 
             // Password
-            if (!string.IsNullOrWhiteSpace(request.Password))
+            if (!string.IsNullOrWhiteSpace(request.NewPassword))
             {
-                var token = await _userManager
-                    .GeneratePasswordResetTokenAsync(user);
+                if (string.IsNullOrWhiteSpace(request.CurrentPassword))
+                {
+                    return BadRequest(new
+                    {
+                        Message = "Current password is required."
+                    });
+                }
 
                 var passwordResult =
-                    await _userManager.ResetPasswordAsync(
+                    await _userManager.ChangePasswordAsync(
                         user,
-                        token,
-                        request.Password);
+                        request.CurrentPassword,
+                        request.NewPassword
+                    );
 
                 if (!passwordResult.Succeeded)
                 {
-                    return BadRequest(
-                        passwordResult.Errors
-                            .Select(e => e.Description));
+                    return BadRequest(new
+                    {
+                        Message = passwordResult.Errors
+                            .FirstOrDefault()?.Description
+                            ?? "Failed to update password."
+                    });
                 }
             }
 
@@ -208,6 +218,7 @@ namespace MiniCRM.Server.Controllers
             });
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(
         string id, [FromBody] UpdateUserDto request)
@@ -287,6 +298,7 @@ namespace MiniCRM.Server.Controllers
             });
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPatch("{id}/deactivate")]
         public async Task<IActionResult> DeactivateUser(string id)
         {
