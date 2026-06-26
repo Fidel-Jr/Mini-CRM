@@ -34,31 +34,12 @@ export function AuthProvider({
         try {
             const res = await fetch("/api/auth/me");
 
-            // if (!res.ok) {
-            //     setUser(null);
-            //     return;
-            // }
-
-            if(res.status===401){
-
-            const refresh = await fetch(
-                "/api/auth/refresh",
-                {
-                    method:"POST"
-                }
-                );
-
-                if(refresh.ok){
-
-                    return refreshUser();
-
-                }
+            if (!res.ok) {
                 await logout();
+                return;
             }
 
-            const data = await res.json();
-            setUser(data);
-
+            setUser(await res.json());
         } catch {
             setUser(null);
         } finally {

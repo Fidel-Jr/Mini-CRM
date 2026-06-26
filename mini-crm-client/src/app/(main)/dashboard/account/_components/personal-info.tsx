@@ -321,7 +321,7 @@ const onSubmit = (
             )
         }>
           <div className='mb-6 w-full space-y-2'>
-            <Label>Your Avatar</Label>
+            <Label>Your Profile Image</Label>
             <div className='flex items-center gap-4'>
               <div  
                 role='button'
@@ -363,7 +363,7 @@ const onSubmit = (
                 <input ref={inputRef} type='file' accept='image/*' className='hidden' onChange={onSelect} />
                 <Button type='button' variant='outline' onClick={openPicker} className='flex items-center gap-2'>
                   <UploadCloudIcon />
-                  Upload avatar
+                  Upload image
                 </Button>
                 <Button type='button' variant='ghost' onClick={remove} disabled={!file} className='text-destructive!'>
                   <TrashIcon />

@@ -1,47 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
+    const pathname = request.nextUrl.pathname;
 
-    const token =
-        request.cookies.get("access_token")?.value;
+    const hasAccessToken =
+        request.cookies.has("access_token");
 
-    const path =
-        request.nextUrl.pathname;
+    const hasRefreshToken =
+        request.cookies.has("refresh_token");
 
+    const hasSession =
+        hasAccessToken || hasRefreshToken;
 
-    // Not authenticated
+    // Protected routes
     if (
-        !token &&
-        path.startsWith("/dashboard")
+        pathname.startsWith("/dashboard") &&
+        !hasSession
     ) {
-
         return NextResponse.redirect(
-            new URL(
-                "/login",
-                request.url
-            )
+            new URL("/login", request.url)
         );
     }
 
-
-    // Already authenticated
+    // Already logged in
     if (
-        token &&
-        path === "/login"
+        pathname === "/login" &&
+        hasSession
     ) {
-
         return NextResponse.redirect(
-            new URL(
-                "/dashboard/crm",
-                request.url
-            )
+            new URL("/dashboard/crm", request.url)
         );
     }
-
 
     return NextResponse.next();
 }
-
 
 export const config = {
     matcher: [

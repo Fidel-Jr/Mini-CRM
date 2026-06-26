@@ -2,16 +2,11 @@ import { NextResponse } from "next/server";
 
 export async function POST() {
     const response = NextResponse.json({
-        success: true
+        success: true,
     });
 
-    response.cookies.set("accessToken", "", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        expires: new Date(0), // 👈 this deletes it
-    });
+    response.cookies.delete("access_token");
+    response.cookies.delete("refresh_token");
 
     return response;
 }

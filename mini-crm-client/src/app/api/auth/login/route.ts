@@ -32,6 +32,7 @@ export async function POST(req:Request){
             secure: true,
             sameSite: "lax",
             path: "/",
+            expires: new Date(result.accessTokenExpiresAt)
         }
     );
 
@@ -43,9 +44,9 @@ export async function POST(req:Request){
             secure: true,
             sameSite: "lax",
             path: "/",
+            expires: new Date(result.refreshTokenExpiresAt)
         }
     );
-
 
     return Response.json({
         success:true
