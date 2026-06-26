@@ -19,7 +19,7 @@ export default function Layout({ children }: Readonly<{ children: ReactNode }>) 
             </p>
 
             <p className="mt-5 max-w-lg text-sm leading-6 opacity-90">
-              Mini CRM is a small Customer Relationship Management (CRM) application for managing customers, contacts, and opportunities, enhanced with an AI knowledge assistant powered by company documents.
+              Mini CRM is a small Customer Relationship Management (CRM) application for managing customers, contacts, and opportunities, enhanced with an AI knowledge assistant powered by company documents and basic dashboard analytics.
               This is a personal project built to showcase full-stack development skills, including authentication, authorization, relational database design, RESTful API development, business workflow implementation, and Retrieval-Augmented Generation (RAG) using Large Language Models.
             </p>
 
@@ -56,14 +56,14 @@ export default function Layout({ children }: Readonly<{ children: ReactNode }>) 
             <div className="space-y-2 text-sm opacity-90">
               <p>
                 <span className="font-medium">Admin</span><br />
-                admin@gmail.com -
-                ADMIN_123
+                admin@example.com -
+                Admin@12345
               </p>
 
               <p>
                 <span className="font-medium">Sales Representative</span><br />
-                user@gmail.com - 
-                USER_123
+                salesrep@example.com - 
+                Salesrep@12345
               </p>
             </div>
             </div>

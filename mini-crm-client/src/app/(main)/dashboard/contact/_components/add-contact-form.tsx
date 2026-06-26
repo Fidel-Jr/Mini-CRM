@@ -293,7 +293,7 @@ export function AddContactForm() {
           render={({ field, fieldState }) => (
             <div className="grid gap-3" data-invalid={fieldState.invalid}>
               <Label htmlFor="contact-person-position" className="text-sm font-semibold text-gray-700">
-                Phone
+                Position
               </Label>
               <Input
                 {...field}

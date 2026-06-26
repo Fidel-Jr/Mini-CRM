@@ -50,7 +50,11 @@ const onSubmit = async (data: z.infer<typeof formSchema>) => {
       const errorData = await response.json();
       form.setError('root', { message: errorData.error });
       toast.error('Login failed', {
-        description: errorData.error || 'Invalid credentials',
+        description: (
+          <span className="text-red-600">
+            {errorData.error || 'Invalid credentials'}
+          </span>
+        ),
       });
       return;
     }
@@ -60,9 +64,10 @@ const onSubmit = async (data: z.infer<typeof formSchema>) => {
     // ✅ Remove localStorage - cookie is set automatically
     // localStorage.removeItem("auth_token");  // ❌ Remove this line
 
-    toast.success('Login successful', {
-      description: 'You\'ve been logged in successfully.',
-    });
+    toast.success('Login successful',
+        {
+          description: ( <span className="text-green-600">{"You\'ve been logged in successfully."}</span>),
+        });
     await refreshUser();
     console.log("Setting cookie:", result.token);
     router.push('/dashboard/crm');
