@@ -61,19 +61,15 @@ namespace MiniCRM.Server.Controllers
                 });
             }
 
-            var accessExpires =
-                DateTime.UtcNow.AddMinutes(
-                    int.Parse(_configuration["Jwt:ExpiresInMinutes"]!));
-
-            var token = await _jwtService.GenerateAccessTokenAsync(user);
+            var accessToken = await _jwtService.GenerateAccessTokenAsync(user);
             var refreshToken = await _jwtService.GenerateRefreshTokenAsync(user.Id);
 
             return Ok(new LoginResponse
             {
-                AccessToken = token,
-                RefreshToken = refreshToken,
-                AccessTokenExpiresAt = accessExpires,
-                RefreshTokenExpiresAt = DateTime.UtcNow.AddDays(7)
+                AccessToken = accessToken.Token,
+                RefreshToken = refreshToken.Token,
+                AccessTokenExpiresAt = accessToken.Expires,
+                RefreshTokenExpiresAt = refreshToken.Expires
             });
         }
 
@@ -131,16 +127,12 @@ namespace MiniCRM.Server.Controllers
             var newAccessToken = await _jwtService.GenerateAccessTokenAsync(user);
             var newRefreshToken = await _jwtService.GenerateRefreshTokenAsync(user.Id);
 
-            var accessExpires =
-                DateTime.UtcNow.AddMinutes(
-                    int.Parse(_configuration["Jwt:ExpiresInMinutes"]!));
-
             return Ok(new
             {
-                AccessToken = newAccessToken,
-                RefreshToken = newRefreshToken,
-                AccessTokenExpiresAt = accessExpires,
-                RefreshTokenExpiresAt = DateTime.UtcNow.AddDays(7)
+                AccessToken = newAccessToken.Token,
+                RefreshToken = newRefreshToken.Token,
+                AccessTokenExpiresAt = newAccessToken.Expires,
+                RefreshTokenExpiresAt = newRefreshToken.Expires
             });
         }
     }

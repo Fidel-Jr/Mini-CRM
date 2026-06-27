@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MiniCRM.Server.Data;
 using MiniCRM.Server.Entities;
+using MiniCRM.Server.Response;
 using System.IdentityModel.Tokens.Jwt;
 
 using System.Security.Claims;
@@ -13,8 +14,8 @@ namespace MiniCRM.Server.Services
 {
     public interface IJwtService
     {
-        Task<string> GenerateAccessTokenAsync(ApplicationUser user);
-        Task<string> GenerateRefreshTokenAsync(string userId);
+        Task<TokenResponse> GenerateAccessTokenAsync(ApplicationUser user);
+        Task<TokenResponse> GenerateRefreshTokenAsync(string userId);
     }
     public class JwtService : IJwtService
     {
@@ -31,7 +32,7 @@ namespace MiniCRM.Server.Services
             _context = context; 
         }
 
-        public async Task<string> GenerateAccessTokenAsync(ApplicationUser user)
+        public async Task<TokenResponse> GenerateAccessTokenAsync(ApplicationUser user)
         {
             var roles =
                 await _userManager.GetRolesAsync(user); 
@@ -56,21 +57,25 @@ namespace MiniCRM.Server.Services
                     key,
                     SecurityAlgorithms.HmacSha256);
 
+            var expires = DateTime.UtcNow.AddMinutes(
+                int.Parse(_configuration["Jwt:ExpiresInMinutes"]!));
+
             var token =
                 new JwtSecurityToken(
                     issuer: _configuration["Jwt:Issuer"],
                     audience: _configuration["Jwt:Audience"],
                     claims: claims,
-                    expires: DateTime.UtcNow.AddMinutes(
-                        int.Parse(_configuration["Jwt:ExpiresInMinutes"]!)
-                    ),
+                    expires: expires,
                     signingCredentials: credentials);
 
-            return new JwtSecurityTokenHandler()
-                .WriteToken(token);
+            return new TokenResponse
+            {
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                Expires = expires
+            };
         }
 
-        public async Task<string> GenerateRefreshTokenAsync(string userId)
+        public async Task<TokenResponse> GenerateRefreshTokenAsync(string userId)
         {
             var refreshToken = new RefreshToken
             {
@@ -84,7 +89,11 @@ namespace MiniCRM.Server.Services
             _context.RefreshTokens.Add(refreshToken);
             await _context.SaveChangesAsync();
 
-            return refreshToken.Token;
+            return new TokenResponse
+            {
+                Token = refreshToken.Token,
+                Expires = refreshToken.Expires
+            };
         }
     }
 }

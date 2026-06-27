@@ -22,6 +22,7 @@ namespace MiniCRM.Server.Seeders
                     LastName = "Admin",
                     UserName = adminEmail,
                     Email = adminEmail,
+                    JoinedDate = DateOnly.FromDateTime(DateTime.UtcNow),
                 };
 
                 var result = await userManager.CreateAsync(admin, "Admin@12345");
@@ -41,6 +42,7 @@ namespace MiniCRM.Server.Seeders
                     LastName = "Representative",
                     UserName = salesEmail,
                     Email = salesEmail,
+                    JoinedDate = DateOnly.FromDateTime(DateTime.UtcNow)
                 };
 
                 var result = await userManager.CreateAsync(sales, "Salesrep@12345");
