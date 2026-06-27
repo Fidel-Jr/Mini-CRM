@@ -20,13 +20,15 @@ namespace MiniCRM.Server.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly DataIngestor _dataIngestor;
         private readonly ChatService _chatService;
+        private readonly ILogger<DocumentsController> _logger;
 
-        public DocumentsController(AppDbContext context, IWebHostEnvironment environment, DataIngestor dataIngestor, ChatService chatService)
+        public DocumentsController(AppDbContext context, IWebHostEnvironment environment, DataIngestor dataIngestor, ChatService chatService, ILogger<DocumentsController> logger)
         {
             _context = context;
             _environment = environment;
             _dataIngestor = dataIngestor;
             _chatService = chatService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -67,9 +69,21 @@ namespace MiniCRM.Server.Controllers
                 await documentDto.File.CopyToAsync(stream);
             }
 
+            _logger.LogInformation("Starting ingestion");
+            var logPath = Path.Combine(_environment.WebRootPath, "logs");
+            Directory.CreateDirectory(logPath);
+
             await _dataIngestor.IngestDataAsync(
                 new DirectoryInfo(dataDir),
                 storedFileName);
+
+            await System.IO.File.AppendAllTextAsync(
+                Path.Combine(logPath, "ingest.log"),
+                $"{DateTime.UtcNow}: Finished ingestion{Environment.NewLine}"
+            );
+
+
+            _logger.LogInformation("Finished ingestion");
 
             var document = new Document
             {

@@ -36,8 +36,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IJwtService, JwtService>();
 
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Missing configuration: ConnectionStrings:DefaultConnection");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")).UseSnakeCaseNamingConvention());
+    options.UseNpgsql(connectionString)
+           .UseSnakeCaseNamingConvention());
 
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>()
@@ -112,7 +116,7 @@ var openAIOptions = new OpenAIClientOptions()
 };
 
 var ghModelsClient = new OpenAIClient(credential, openAIOptions);
-var chatClient = ghModelsClient.GetChatClient("google/gemma-4-31b-it:free").AsIChatClient();
+var chatClient = ghModelsClient.GetChatClient(builder.Configuration["ModelName"] ?? throw new InvalidOperationException("Missing configuration: ModelName")).AsIChatClient();
 var embeddingGenerator = ghModelsClient.GetEmbeddingClient("openai/text-embedding-3-small").AsIEmbeddingGenerator();
 
 var testEmbedding = await embeddingGenerator.GenerateAsync("policies");
@@ -146,11 +150,35 @@ await UserSeeder.SeedAsync(
     scope.ServiceProvider);
 
 // Configure the HTTP request pipeline.
+
+
+app.MapOpenApi();
+app.UseSwagger();
+app.UseSwaggerUI();
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler(errApp =>
+    {
+        errApp.Run(async ctx =>
+        {
+            ctx.Response.StatusCode = 500;
+            ctx.Response.ContentType = "application/json";
+            var error = ctx.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+            if (error != null)
+            {
+                await ctx.Response.WriteAsJsonAsync(new
+                {
+                    message = error.Error.Message,
+                    type = error.Error.GetType().Name
+                });
+            }
+        });
+    });
 }
 
 app.UseHttpsRedirection();

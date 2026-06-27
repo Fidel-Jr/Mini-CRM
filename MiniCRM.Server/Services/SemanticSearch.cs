@@ -43,14 +43,34 @@ public class SemanticSearch(
     {
         await LoadDocumentsAsync();
 
+        await File.AppendAllTextAsync(
+       Path.Combine(AppContext.BaseDirectory, "wwwroot/logs/rag.log"),
+       $"{DateTime.Now}: Query = {text}\n");
+
         var embedding = await embeddingGenerator.GenerateAsync(text);
         Console.WriteLine($"Embedding length: {embedding.Vector.Length}");
+        await File.AppendAllTextAsync(
+        Path.Combine(AppContext.BaseDirectory, "wwwroot/logs/rag.log"),
+        $"{DateTime.Now}: Embedding length = {embedding.Vector.Length}\n");
 
         var nearest = vectorCollection.SearchAsync(text, maxResults, new VectorSearchOptions<IngestedChunk>
         {
             Filter = documentIdFilter is { Length: > 0 } ? record => record.DocumentId == documentIdFilter : null,
         });
         var results = await nearest.ToListAsync();
+
+        // LOG 3: Number of results
+        await File.AppendAllTextAsync(
+            Path.Combine(AppContext.BaseDirectory, "wwwroot/logs/rag.log"),
+            $"{DateTime.Now}: Found {results.Count} results\n");
+
+        // LOG 4: Retrieved chunks
+        foreach (var result in results)
+        {
+            await File.AppendAllTextAsync(
+                Path.Combine(AppContext.BaseDirectory, "wwwroot/logs/rag.log"),
+                $"{DateTime.Now}: DocumentId = {result.Record.DocumentId}\n");
+        }
         Console.WriteLine($"Found {results.Count} results");
 
         return await nearest.Select(result => result.Record).ToListAsync();
