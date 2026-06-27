@@ -31,7 +31,7 @@ export async function POST(req:Request){
         {
             httpOnly: true,
             secure: true,
-            sameSite: "lax",
+            sameSite: "none",
             path: "/",
             expires: new Date(result.accessTokenExpiresAt)
         }
@@ -43,7 +43,7 @@ export async function POST(req:Request){
         {
             httpOnly: true,
             secure: true,
-            sameSite: "lax",
+            sameSite: "none",
             path: "/",
             expires: new Date(result.refreshTokenExpiresAt)
         }
