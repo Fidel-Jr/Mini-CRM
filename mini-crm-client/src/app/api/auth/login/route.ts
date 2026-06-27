@@ -1,20 +1,19 @@
+import { apiFetch } from '@/lib/api';
 import { cookies } from 'next/headers';
 
 export async function POST(req:Request){
 
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL;
-
     const body = await req.json();
 
-    const response = await fetch(
-        `${API_BASE}/api/Auth/login`,
+    const response = await apiFetch(
+        "/api/Auth/login",
         {
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
             },
-            body:JSON.stringify(body)
-        }
+            body: JSON.stringify(body),
+        },
     );
 
 
