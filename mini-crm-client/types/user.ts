@@ -4,5 +4,5 @@ export type User = {
     lastName: string;
     email: string;
     roles: string[];
-    avatar?: string | null;
+    profileImage?: string | null;
 };

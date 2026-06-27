@@ -30,7 +30,7 @@ export default async function Page() {
     const isAdmin = user?.roles?.includes("Admin") ?? false;
 
     if (!isAdmin) {
-        redirect("/forbidden");
+        redirect("/unauthorized");
     }
   
   return (
