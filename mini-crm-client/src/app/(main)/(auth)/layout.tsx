@@ -18,12 +18,12 @@ export default function Layout({ children }: Readonly<{ children: ReactNode }>) 
               Manage customers, opportunities, and company knowledge in one place.
             </p>
 
-            <p className="mt-5 max-w-lg text-sm leading-6 opacity-90">
+            <p className="mt-5 max-w-xl text-sm leading-6 opacity-90">
               Mini CRM is a small Customer Relationship Management (CRM) application for managing customers, contacts, and opportunities, enhanced with an AI knowledge assistant powered by company documents and basic dashboard analytics.
               This is a personal project built to showcase full-stack development skills, including authentication, authorization, relational database design, RESTful API development, business workflow implementation, and Retrieval-Augmented Generation (RAG) using Large Language Models.
             </p>
 
-            <p className="mt-4 max-w-lg text-sm leading-6 opacity-80">
+            <p className="mt-4 max-w-xl text-sm leading-6 opacity-80">
               The interface is based on the next-shadcn-admin-dashboard template by
               <span className="font-semibold"> arhamkhnz</span>, customized and extended
               to support CRM workflows and AI features.

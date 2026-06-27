@@ -2,10 +2,12 @@ import { cookies } from 'next/headers';
 
 export async function POST(req:Request){
 
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
     const body = await req.json();
 
     const response = await fetch(
-        "https://localhost:7187/api/Auth/login",
+        `${API_BASE}/api/Auth/login`,
         {
             method:"POST",
             headers:{
