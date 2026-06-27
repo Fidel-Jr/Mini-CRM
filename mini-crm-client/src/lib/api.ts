@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE = process.env.API_URL;
 
 export async function apiFetch(
     path: string,
@@ -71,10 +71,7 @@ export async function apiFetch(
         cookieStore.delete("access_token");
         cookieStore.delete("refresh_token");
 
-        return Response.json(
-            { error: "SESSION_EXPIRED" },
-            { status: 401 }
-        );
+        return response;
     }
 
     const tokens =
