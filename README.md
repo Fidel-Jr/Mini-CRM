@@ -85,5 +85,5 @@ NEXT_PUBLIC_API_URL=http://localhost:5000/api
 
 The user interface is based on the
 [next-shadcn-admin-dashboard](https://github.com/arhamkhnz/next-shadcn-admin-dashboard)
-template by Mohammed Arham Khan, licensed under the MIT License.
+template by arhamkhnz, licensed under the MIT License.
 The template has been customized and extended to support the CRM workflows and AI features implemented in this project.
