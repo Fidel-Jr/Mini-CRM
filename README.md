@@ -71,9 +71,11 @@ The interface is based on the next-shadcn-admin-dashboard template by arhamkhnz,
 
 Backend
 
-OPENROUTER_API_KEY=your_openrouter_api_key
+OpenRouter:KEY=your_openrouter_api_key
 
 Jwt:Key=your_super_secret_jwt_key
+
+ModelName=ai_model_name
 
 Frontend
 
