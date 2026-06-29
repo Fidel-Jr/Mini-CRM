@@ -1,7 +1,7 @@
 import http from "node:http";
 import https from "node:https";
 
-const backendBaseUrl = process.env.BACKEND_API_URL ?? "https://localhost:7187";
+const backendBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "https://localhost:7187";
 
 type BackendFetchOptions = {
 	method?: string;

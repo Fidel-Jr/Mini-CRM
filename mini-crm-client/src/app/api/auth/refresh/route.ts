@@ -1,3 +1,4 @@
+import { apiFetch } from '@/lib/api';
 import { cookies } from 'next/headers';
 
 export async function POST() {
@@ -21,19 +22,22 @@ export async function POST() {
     }
 
 
-    const response = await fetch(
-        "https://localhost:7187/api/Auth/refresh",
+    const response = await apiFetch(
+
+        "/api/Auth/refresh",
+
         {
             method: "POST",
 
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             },
 
             body: JSON.stringify({
-                refreshToken
-            })
-        }
+                refreshToken,
+            }),
+        },
+
     );
 
 
