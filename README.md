@@ -45,7 +45,9 @@ The interface is based on the next-shadcn-admin-dashboard template by arhamkhnz,
 - TypeScript
 - Tailwind CSS
 - shadcn/ui
-- TanStack Query
+- React Hook Form – Form management
+- Zod – Schema validation
+- TanStack Query (React Query) – Server state management
 
 ### Backend
 - ASP.NET Core Web API
@@ -59,13 +61,16 @@ The interface is based on the next-shadcn-admin-dashboard template by arhamkhnz,
 ### AI
 - OpenRouter API
 - Retrieval-Augmented Generation (RAG)
-- Vector Embeddings
 
 ### Tools & Deployment
 - Git
-- Neon
 - Vercel
 - MonsterASP.NET
+- Neon
+  
+### Architecture
+- RESTful API
+- Monolith Architecture
 
 ## Environment Variables
 
