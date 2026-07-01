@@ -121,7 +121,7 @@ export function AddCustomerForm() {
                 />
 
                 <p className="text-xs text-muted-foreground">
-                    Supported formats: PDF, WORD, TXT
+                    Supported formats: PDF, MD
                 </p>
 
                 {fieldState.error && (
