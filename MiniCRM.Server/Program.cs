@@ -16,6 +16,9 @@ using OpenAI.Chat;
 using System.ClientModel;
 using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.SemanticKernel;
+using Npgsql;
+using Microsoft.SemanticKernel.Connectors.PgVector;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -123,10 +126,17 @@ var testEmbedding = await embeddingGenerator.GenerateAsync("policies");
 Console.WriteLine($"Embedding dims: {testEmbedding.Vector.Length}");
 Console.WriteLine($"First 5 values: {string.Join(", ", testEmbedding.Vector.ToArray().Take(5))}");
 
-var vectorStorePath = Path.Combine(AppContext.BaseDirectory, "vector-store.db");
-var vectorStoreConnectionString = $"Data Source={vectorStorePath}";
-builder.Services.AddSqliteVectorStore(_ => vectorStoreConnectionString);
-builder.Services.AddSqliteCollection<Guid, IngestedChunk>(IngestedChunk.CollectionName, vectorStoreConnectionString);
+//var vectorStorePath = Path.Combine(AppContext.BaseDirectory, "vector-sto  re.db");
+//var vectorStoreConnectionString = $"Data Source={vectorStorePath}";
+builder.Services.AddSingleton<NpgsqlDataSource>(_ =>
+{
+    var dsb = new NpgsqlDataSourceBuilder(connectionString);
+    dsb.UseVector();
+    return dsb.Build();
+});
+builder.Services.AddPostgresVectorStore();
+builder.Services.AddPostgresCollection<Guid, IngestedChunk>(
+    IngestedChunk.CollectionName);
 builder.Services.AddSingleton<DataIngestor>();
 builder.Services.AddSingleton<SemanticSearch>();
 builder.Services.AddKeyedSingleton("ingestion_directory", new DirectoryInfo(Path.Combine(builder.Environment.WebRootPath, "Data")));

@@ -14,22 +14,43 @@ public class DataIngestor(
 {
     public async Task IngestDataAsync(DirectoryInfo directory, string searchPattern)
     {
-        using var writer = new VectorStoreWriter<string>(vectorStore, dimensionCount: IngestedChunk.VectorDimensions, new()
-        {
-            CollectionName = IngestedChunk.CollectionName,
-            DistanceFunction = IngestedChunk.VectorDistanceFunction,
-            IncrementalIngestion = false,
-        });
+        var logPath = Path.Combine(AppContext.BaseDirectory, "wwwroot/logs/ingest.log");
 
-        using var pipeline = new IngestionPipeline<string>(
-            reader: new DocumentReader(directory),
-            chunker: new SemanticSimilarityChunker(embeddingGenerator, new(TiktokenTokenizer.CreateForModel("gpt-4o"))),
-            writer: writer,
-            loggerFactory: loggerFactory);
+        await File.AppendAllTextAsync(logPath, $"{DateTime.UtcNow}: IngestDataAsync started\n");
 
-        await foreach (var result in pipeline.ProcessAsync(directory, searchPattern))
+        try
         {
-            logger.LogInformation("Completed processing '{id}'. Succeeded: '{succeeded}'.", result.DocumentId, result.Succeeded);
+            using var writer = new VectorStoreWriter<string>(vectorStore, dimensionCount: IngestedChunk.VectorDimensions, new()
+            {
+                CollectionName = IngestedChunk.CollectionName,
+                DistanceFunction = IngestedChunk.VectorDistanceFunction,
+                IncrementalIngestion = false,
+            });
+
+            await File.AppendAllTextAsync(logPath, $"{DateTime.UtcNow}: VectorStoreWriter created\n");
+
+            using var pipeline = new IngestionPipeline<string>(
+                reader: new DocumentReader(directory),
+                chunker: new SemanticSimilarityChunker(embeddingGenerator, new(TiktokenTokenizer.CreateForModel("gpt-4o-mini"))),
+                writer: writer,
+                loggerFactory: loggerFactory);
+
+            await File.AppendAllTextAsync(logPath, $"{DateTime.UtcNow}: Pipeline created, starting ProcessAsync\n");
+
+            await foreach (var result in pipeline.ProcessAsync(directory, searchPattern))
+            {
+                await File.AppendAllTextAsync(logPath,
+                    $"{DateTime.UtcNow}: Doc='{result.DocumentId}' Succeeded={result.Succeeded} Error={result.Exception?.Message ?? "none"}\n");
+
+                logger.LogInformation("Completed processing '{id}'. Succeeded: '{succeeded}'.", result.DocumentId, result.Succeeded);
+            }
+
+            await File.AppendAllTextAsync(logPath, $"{DateTime.UtcNow}: ProcessAsync completed\n");
+        }
+        catch (Exception ex)
+        {
+            await File.AppendAllTextAsync(logPath, $"{DateTime.UtcNow}: EXCEPTION: {ex}\n");
+            throw;
         }
     }
 }

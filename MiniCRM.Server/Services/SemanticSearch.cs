@@ -12,69 +12,92 @@ public class SemanticSearch(
 {
     private Task? _ingestionTask;
 
-    //public async Task LoadDocumentsAsync() => await (_ingestionTask ??= dataIngestor.IngestDataAsync(ingestionDirectory, searchPattern: "*.*"));
-
     public async Task LoadDocumentsAsync()
     {
         await (_ingestionTask ??= EnsureDocumentsLoadedAsync());
     }
 
-    private async Task EnsureDocumentsLoadedAsync()
+    public async Task IngestDocumentAsync(DirectoryInfo directory, string fileName)
     {
-        var vectorDbPath = Path.Combine(
-            AppContext.BaseDirectory,
-            "vector-store.db");
+        await vectorCollection.EnsureCollectionExistsAsync();
+        await dataIngestor.IngestDataAsync(directory, fileName);
 
-        if (File.Exists(vectorDbPath))
-        {
-            return;
-        }
-
-        await dataIngestor.IngestDataAsync(
-            ingestionDirectory,
-            "*.*");
+        // Reset so the next search re-checks instead of assuming nothing has changed
+        _ingestionTask = null;
     }
 
+    private async Task EnsureDocumentsLoadedAsync()
+    {
+        await vectorCollection.EnsureCollectionExistsAsync();
+
+        // Check if collection already has data by doing a minimal search
+        var dummyEmbedding = await embeddingGenerator.GenerateAsync("test");
+        var any = await vectorCollection
+            .SearchAsync(dummyEmbedding.Vector, top: 1)
+            .AnyAsync();
+
+        if (any)
+        {
+            return; // Already ingested, skip
+        }
+
+        await dataIngestor.IngestDataAsync(ingestionDirectory, "*.*");
+    }
 
     public async Task<IReadOnlyList<IngestedChunk>> SearchAsync(
-    string text,
-    string? documentIdFilter,
-    int maxResults)
+        string text,
+        string? documentIdFilter,
+        int maxResults)
     {
         await LoadDocumentsAsync();
 
         await File.AppendAllTextAsync(
-       Path.Combine(AppContext.BaseDirectory, "wwwroot/logs/rag.log"),
-       $"{DateTime.Now}: Query = {text}\n");
+            Path.Combine(AppContext.BaseDirectory, "wwwroot/logs/rag.log"),
+            $"{DateTime.Now}: ===== NEW SEARCH =====\n{DateTime.Now}: Query = {text}\n");
 
         var embedding = await embeddingGenerator.GenerateAsync(text);
-        Console.WriteLine($"Embedding length: {embedding.Vector.Length}");
-        await File.AppendAllTextAsync(
-        Path.Combine(AppContext.BaseDirectory, "wwwroot/logs/rag.log"),
-        $"{DateTime.Now}: Embedding length = {embedding.Vector.Length}\n");
 
-        var nearest = vectorCollection.SearchAsync(text, maxResults, new VectorSearchOptions<IngestedChunk>
-        {
-            Filter = documentIdFilter is { Length: > 0 } ? record => record.DocumentId == documentIdFilter : null,
-        });
-        var results = await nearest.ToListAsync();
-
-        // LOG 3: Number of results
         await File.AppendAllTextAsync(
             Path.Combine(AppContext.BaseDirectory, "wwwroot/logs/rag.log"),
-            $"{DateTime.Now}: Found {results.Count} results\n");
+            $"{DateTime.Now}: Embedding length = {embedding.Vector.Length}\n{DateTime.Now}: Starting vector search...\n");
 
-        // LOG 4: Retrieved chunks
-        foreach (var result in results)
+        try
+        {
+            var nearest = vectorCollection.SearchAsync(
+                embedding.Vector,  // pass the actual float vector, not the raw text
+                maxResults,
+                new VectorSearchOptions<IngestedChunk>
+                {
+                    Filter = documentIdFilter is { Length: > 0 }
+                        ? record => record.DocumentId == documentIdFilter
+                        : null,
+                });
+
+            await File.AppendAllTextAsync(
+                Path.Combine(AppContext.BaseDirectory, "wwwroot/logs/rag.log"),
+                $"{DateTime.Now}: SearchAsync() returned. Enumerating...\n");
+
+            var results = await nearest.Select(r => r.Record).ToListAsync();
+
+            await File.AppendAllTextAsync(
+                Path.Combine(AppContext.BaseDirectory, "wwwroot/logs/rag.log"),
+                $"{DateTime.Now}: Found {results.Count} results\n");
+
+            foreach (var result in results)
+            {
+                await File.AppendAllTextAsync(
+                    Path.Combine(AppContext.BaseDirectory, "wwwroot/logs/rag.log"),
+                    $"{DateTime.Now}: DocumentId = {result.DocumentId}\n");
+            }
+
+            return results;
+        }
+        catch (Exception ex)
         {
             await File.AppendAllTextAsync(
                 Path.Combine(AppContext.BaseDirectory, "wwwroot/logs/rag.log"),
-                $"{DateTime.Now}: DocumentId = {result.Record.DocumentId}\n");
+                $"{DateTime.Now}: EXCEPTION OCCURRED\n{ex}\n");
+            throw;
         }
-        Console.WriteLine($"Found {results.Count} results");
-
-        return await nearest.Select(result => result.Record).ToListAsync();
     }
-
-
 }

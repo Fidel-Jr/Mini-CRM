@@ -26,8 +26,8 @@ namespace MiniCRM.Server.Controllers
             var customers = await _context.Customers
                 .AsNoTracking()
                 .OrderBy(x => x.Name)
-                 .Select(x => new CustomerDetailsDto
-                 {
+                .Select(x => new CustomerDetailsDto
+                {
                      Id = x.Id,
                      Name = x.Name,
                      Industry = x.Industry,
@@ -57,8 +57,9 @@ namespace MiniCRM.Server.Controllers
                          Content = n.Content
                      }).ToList(),
 
-                 })
+                })
                 .ToListAsync();
+
             var industries = await _context.Customers
                 .AsNoTracking()
                 .GroupBy(c => c.Industry)

@@ -18,15 +18,15 @@ namespace MiniCRM.Server.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IWebHostEnvironment _environment;
-        private readonly DataIngestor _dataIngestor;
+        private readonly SemanticSearch _semanticSearch;
         private readonly ChatService _chatService;
         private readonly ILogger<DocumentsController> _logger;
 
-        public DocumentsController(AppDbContext context, IWebHostEnvironment environment, DataIngestor dataIngestor, ChatService chatService, ILogger<DocumentsController> logger)
+        public DocumentsController(AppDbContext context, IWebHostEnvironment environment, SemanticSearch semanticSearch, ChatService chatService, ILogger<DocumentsController> logger)
         {
             _context = context;
             _environment = environment;
-            _dataIngestor = dataIngestor;
+            _semanticSearch = semanticSearch;
             _chatService = chatService;
             _logger = logger;
         }
@@ -73,7 +73,7 @@ namespace MiniCRM.Server.Controllers
             var logPath = Path.Combine(_environment.WebRootPath, "logs");
             Directory.CreateDirectory(logPath);
 
-            await _dataIngestor.IngestDataAsync(
+            await _semanticSearch.IngestDocumentAsync(
                 new DirectoryInfo(dataDir),
                 storedFileName);
 

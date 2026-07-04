@@ -70,7 +70,7 @@ namespace MiniCRM.Server.Controllers
                 JoinedDate = request.JoinedDate,
             };
 
-            var DEFAULT_PASSWORD = user.FirstName + user.LastName + "123!   "; // Default password
+            var DEFAULT_PASSWORD = user.FirstName + user.LastName + "123!"; // Default password
 
             var createResult = await _userManager.CreateAsync(
                 user,
